@@ -5,7 +5,6 @@
 /* --Sparse Optical Flow Demo Program--
 * Written by David Stavens (dstavens@robotics.stanford.edu)
 */
-#include <stdio.h>
 #include <cv.h>
 #include <highgui.h>
 #include <math.h>
@@ -19,8 +18,7 @@ inline static double square(int a)
 * unless that image is already non-NULL. It always leaves a non-NULL image as-is even
 * if that image's size, depth, and/or channels are different than the request.
 */
-inline static void allocateOnDemand(IplImage **img, CvSize size, int depth, int channels
-	)
+inline static void allocateOnDemand(IplImage **img, CvSize size, int depth, int channels)
 {
 	if (*img != NULL) return;
 	*img = cvCreateImage(size, depth, channels);
@@ -33,10 +31,7 @@ inline static void allocateOnDemand(IplImage **img, CvSize size, int depth, int 
 int main(void)
 {
 	/* Create an object that decodes the input video stream. */
-	CvCapture *input_video = cvCaptureFromFile(
-		"C:\\Documents and Settings\\David Stavens\\Desktop\\223B-Demo\\optical_flow_input
-		.avi"
-		);
+	CvCapture *input_video = cvCaptureFromFile("C:\\Documents and Settings\\David Stavens\\Desktop\\223B-Demo\\optical_flow_input.avi");
 	if (input_video == NULL)
 	{
 		/* Either the video didn't exist OR it uses a codec OpenCV
@@ -61,7 +56,6 @@ int main(void)
 	/* Go to the end of the AVI (ie: the fraction is "1") */
 	cvSetCaptureProperty(input_video, CV_CAP_PROP_POS_AVI_RATIO, 1.);
 	/* Now that we're at the end, read the AVI position in frames */
-C:\Documents and Settings\David Stavens\Desktop\223B - Demo\optical_flow_demo.cpp 2
 	number_of_frames = (int)cvGetCaptureProperty(input_video, CV_CAP_PROP_POS_FRAMES);
   /* Return to the beginning */
   cvSetCaptureProperty(input_video, CV_CAP_PROP_POS_FRAMES, 0.);
@@ -122,7 +116,6 @@ C:\Documents and Settings\David Stavens\Desktop\223B - Demo\optical_flow_demo.cp
 	  allocateOnDemand(&frame2_1C, frame_size, IPL_DEPTH_8U, 1);
 	  cvConvertImage(frame, frame2_1C, CV_CVTIMG_FLIP);
 	  /* Shi and Tomasi Feature Tracking! */
-  C:\Documents and Settings\David Stavens\Desktop\223B - Demo\optical_flow_demo.cpp 3
 	  /* Preparation: Allocate the necessary storage. */
 	  allocateOnDemand(&eig_image, frame_size, IPL_DEPTH_32F, 1);
 	allocateOnDemand(&temp_image, frame_size, IPL_DEPTH_32F, 1);
@@ -180,7 +173,6 @@ C:\Documents and Settings\David Stavens\Desktop\223B - Demo\optical_flow_demo.cp
 	*/
 	CvTermCriteria optical_flow_termination_criteria
 		= cvTermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, .3);
-C:\Documents and Settings\David Stavens\Desktop\223B - Demo\optical_flow_demo.cpp 4
 	/* This is some workspace for the algorithm.
 	* (The algorithm actually carves the image into pyramids of different resolutions
 	.)
@@ -241,7 +233,6 @@ C:\Documents and Settings\David Stavens\Desktop\223B - Demo\optical_flow_demo.cp
 	  q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
 	  q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
 	  /* Now we draw the main line of the arrow. */
-  C:\Documents and Settings\David Stavens\Desktop\223B - Demo\optical_flow_demo.cpp 5
 	  /* "frame1" is the frame to draw on.
 	  * "p" is the point where the line begins.
 	  * "q" is the point where the line stops.
