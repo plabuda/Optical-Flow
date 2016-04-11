@@ -8,6 +8,8 @@
 #include <cv.h>
 #include <highgui.h>
 #include <math.h>
+
+#define NOF 1000
 static const double pi = 3.14159265358979323846;
 inline static double square(int a)
 {
@@ -31,7 +33,7 @@ inline static void allocateOnDemand(IplImage **img, CvSize size, int depth, int 
 int main(void)
 {
 	/* Create an object that decodes the input video stream. */
-	CvCapture *input_video = cvCaptureFromFile("C:\\Documents and Settings\\David Stavens\\Desktop\\223B-Demo\\optical_flow_input.avi");
+	CvCapture *input_video = cvCaptureFromFile("E:\\Highway.avi");
 	if (input_video == NULL)
 	{
 		/* Either the video didn't exist OR it uses a codec OpenCV
@@ -57,7 +59,7 @@ int main(void)
 	cvSetCaptureProperty(input_video, CV_CAP_PROP_POS_AVI_RATIO, 1.);
 	/* Now that we're at the end, read the AVI position in frames */
 	number_of_frames = (int)cvGetCaptureProperty(input_video, CV_CAP_PROP_POS_FRAMES);
-  /* Return to the beginning */
+  /* Return to the beginning */					
   cvSetCaptureProperty(input_video, CV_CAP_PROP_POS_FRAMES, 0.);
   /* Create three windows called "Frame N", "Frame N+1", and "Optical Flow"
   * for visualizing the output. Have those windows automatically change their
@@ -120,7 +122,7 @@ int main(void)
 	  allocateOnDemand(&eig_image, frame_size, IPL_DEPTH_32F, 1);
 	allocateOnDemand(&temp_image, frame_size, IPL_DEPTH_32F, 1);
 	/* Preparation: This array will contain the features found in frame 1. */
-	CvPoint2D32f frame1_features[400];
+	CvPoint2D32f frame1_features[NOF];
 	/* Preparation: BEFORE the function call this variable is the array size
 	* (or the maximum number of features to find). AFTER the function call
 	* this variable is the number of features actually found.
@@ -130,7 +132,7 @@ int main(void)
 	/* I'm hardcoding this at 400. But you should make this a #define so that you can
 	* change the number of features you use for an accuracy/speed tradeoff analysis.
 	*/
-	number_of_features = 400;
+	number_of_features = NOF;
 	/* Actually run the Shi and Tomasi algorithm!!
 	* "frame1_1C" is the input image.
 	* "eig_image" and "temp_image" are just workspace for the algorithm.
@@ -148,19 +150,19 @@ int main(void)
 		number_of_features, .01, .01, NULL);
 	/* Pyramidal Lucas Kanade Optical Flow! */
 	/* This array will contain the locations of the points from frame 1 in frame 2. */
-	CvPoint2D32f frame2_features[400];
+	CvPoint2D32f frame2_features[NOF];
 	/* The i-th element of this array will be non-zero if and only if the i-th feature
 	of
 	* frame 1 was found in frame 2.
 	*/
-	char optical_flow_found_feature[400];
+	char optical_flow_found_feature[NOF];
 	/* The i-th element of this array is the error in the optical flow for the i-th
 	feature
 	* of frame1 as found in frame 2. If the i-th feature was not found (see the
 	array above)
 	* I think the i-th entry in this array is undefined.
 	*/
-	float optical_flow_feature_error[400];
+	float optical_flow_feature_error[NOF];
 	/* This is the window size to use to avoid the aperture problem (see slide
 	"Optical Flow: Overview"). */
 	CvSize optical_flow_window = cvSize(3, 3);
@@ -210,7 +212,7 @@ int main(void)
   {
 	  /* If Pyramidal Lucas Kanade didn't really find the feature, skip it. */
 	  if (optical_flow_found_feature[i] == 0) continue;
-	  int line_thickness; line_thickness = 1;
+	  int line_thickness; line_thickness = 2;
 	  /* CV_RGB(red, green, blue) is the red, green, and blue components
 	  * of the color you want, each out of 255.
 	  */
@@ -239,16 +241,18 @@ int main(void)
 	  * "CV_AA" means antialiased drawing.
 	  * "0" means no fractional bits in the center cooridinate or radius.
 	  */
-	  cvLine(frame1, p, q, line_color, line_thickness, CV_AA, 0);
-	/* Now draw the tips of the arrow. I do some scaling so that the
-	* tips look proportional to the main line of the arrow.
-	*/
-	p.x = (int)(q.x + 9 * cos(angle + pi / 4));
-	p.y = (int)(q.y + 9 * sin(angle + pi / 4));
-	cvLine(frame1, p, q, line_color, line_thickness, CV_AA, 0);
-	p.x = (int)(q.x + 9 * cos(angle - pi / 4));
-	p.y = (int)(q.y + 9 * sin(angle - pi / 4));
-	cvLine(frame1, p, q, line_color, line_thickness, CV_AA, 0);
+	  if (hypotenuse > 3 && hypotenuse < 30) {
+		  cvLine(frame1, p, q, line_color, line_thickness, CV_AA, 0);
+		  /* Now draw the tips of the arrow. I do some scaling so that the
+		  * tips look proportional to the main line of the arrow.
+		  */
+		  p.x = (int)(q.x + 9 * cos(angle + pi / 4));
+		  p.y = (int)(q.y + 9 * sin(angle + pi / 4));
+		  cvLine(frame1, p, q, line_color, line_thickness, CV_AA, 0);
+		  p.x = (int)(q.x + 9 * cos(angle - pi / 4));
+		  p.y = (int)(q.y + 9 * sin(angle - pi / 4));
+		  cvLine(frame1, p, q, line_color, line_thickness, CV_AA, 0);
+	  }
   }
   /* Now display the image we drew on. Recall that "Optical Flow" is the name of
   * the window we created above.
@@ -261,14 +265,16 @@ int main(void)
   * The return value is the key the user pressed.
   */
   int key_pressed;
-  key_pressed = cvWaitKey(0);
+  key_pressed = cvWaitKey(1);
+  if (key_pressed == 'q') {
+	  break;
+  }
   /* If the users pushes "b" or "B" go back one frame.
   * Otherwise go forward one frame.
   */
-  if (key_pressed == 'b' || key_pressed == 'B') current_frame--;
-  else current_frame++;
+  current_frame++;
   /* Don't run past the front/end of the AVI. */
   if (current_frame < 0) current_frame = 0;
-  if (current_frame >= number_of_frames - 1) current_frame = number_of_frames - 2;
+  if (current_frame >= number_of_frames - 1) current_frame = 0;
   }
 }
