@@ -1,98 +1,75 @@
-// ConsoleApplication1.cpp : Defines the entry point for the console application.
-//
 
 #include "stdafx.h"
-/* --Sparse Optical Flow Demo Program--
-* Written by David Stavens (dstavens@robotics.stanford.edu)
-*/
 #include <cv.h>
 #include <highgui.h>
 #include <math.h>
 
-#define NOF 1000
+#define NOF 2000
 static const double pi = 3.14159265358979323846;
 inline static double square(int a)
 {
 	return a * a;
 }
-/* This is just an inline that allocates images. I did this to reduce clutter in the
-* actual computer vision algorithmic code. Basically it allocates the requested image
-* unless that image is already non-NULL. It always leaves a non-NULL image as-is even
-* if that image's size, depth, and/or channels are different than the request.
-*/
+
 inline static void allocateOnDemand(IplImage **img, CvSize size, int depth, int channels)
 {
 	if (*img != NULL) return;
 	*img = cvCreateImage(size, depth, channels);
-	if (*img == NULL)
-	{
+
+	if (*img == NULL){
 		fprintf(stderr, "Error: Couldn't allocate image. Out of memory?\n");
 		exit(-1);
 	}
 }
+
 int main(void)
 {
-	/* Create an object that decodes the input video stream. */
 	CvCapture *input_video = cvCaptureFromFile("E:\\Highway.avi");
-	if (input_video == NULL)
-	{
-		/* Either the video didn't exist OR it uses a codec OpenCV
-		* doesn't support.
-		*/
+
+	if (input_video == NULL){
 		fprintf(stderr, "Error: Can't open video.\n");
 		return -1;
 	}
-	/* This is a hack. If we don't call this first then getting capture
-	* properties (below) won't work right. This is an OpenCV bug. We
-	* ignore the return value here. But it's actually a video frame.
-	*/
+
+
 	cvQueryFrame(input_video);
-	/* Read the video's frame size out of the AVI. */
 	CvSize frame_size;
-	frame_size.height =
-		(int)cvGetCaptureProperty(input_video, CV_CAP_PROP_FRAME_HEIGHT);
-	frame_size.width =
-		(int)cvGetCaptureProperty(input_video, CV_CAP_PROP_FRAME_WIDTH);
-	/* Determine the number of frames in the AVI. */
+
+	//Pobieramy wymiary okna
+	frame_size.height = (int)cvGetCaptureProperty(input_video, CV_CAP_PROP_FRAME_HEIGHT);
+	frame_size.width =  (int)cvGetCaptureProperty(input_video, CV_CAP_PROP_FRAME_WIDTH);
+
+	//Obliczamy ilosc klatek w filmie
 	long number_of_frames;
-	/* Go to the end of the AVI (ie: the fraction is "1") */
 	cvSetCaptureProperty(input_video, CV_CAP_PROP_POS_AVI_RATIO, 1.);
-	/* Now that we're at the end, read the AVI position in frames */
 	number_of_frames = (int)cvGetCaptureProperty(input_video, CV_CAP_PROP_POS_FRAMES);
-  /* Return to the beginning */					
-  cvSetCaptureProperty(input_video, CV_CAP_PROP_POS_FRAMES, 0.);
-  /* Create three windows called "Frame N", "Frame N+1", and "Optical Flow"
-  * for visualizing the output. Have those windows automatically change their
-  * size to match the output.
-  */
-  cvNamedWindow("Optical Flow", CV_WINDOW_AUTOSIZE);
-  long current_frame = 0;
-  while (true)
+
+
+	//Powrot do poczatku				
+	cvSetCaptureProperty(input_video, CV_CAP_PROP_POS_FRAMES, 0.);
+
+	cvNamedWindow("Optical Flow", CV_WINDOW_AUTOSIZE);
+	long current_frame = 0;
+
+	while (true)
   {
-	  static IplImage *frame = NULL, *frame1 = NULL, *frame1_1C = NULL, *frame2_1C =
-		  NULL, *eig_image = NULL, *temp_image = NULL, *pyramid1 = NULL, *pyramid2 = NULL;
+	  static IplImage *frame = NULL, *frame1 = NULL, *frame1_1C = NULL, *frame2_1C = NULL, *eig_image = NULL, 
+					  *temp_image = NULL, *pyramid1 = NULL, *pyramid2 = NULL;
 	  /* Go to the frame we want. Important if multiple frames are queried in
 	  * the loop which they of course are for optical flow. Note that the very
 	  * first call to this is actually not needed. (Because the correct position
 	  * is set outsite the for() loop.)
 	  */
 	  cvSetCaptureProperty(input_video, CV_CAP_PROP_POS_FRAMES, current_frame);
-	  /* Get the next frame of the video.
-	  * IMPORTANT! cvQueryFrame() always returns a pointer to the _same_
-	  * memory location. So successive calls:
-	  * frame1 = cvQueryFrame();
-	  * frame2 = cvQueryFrame();
-	  * frame3 = cvQueryFrame();
-	  * will result in (frame1 == frame2 && frame2 == frame3) being true.
-	  * The solution is to make a copy of the cvQueryFrame() output.
-	  */
+
+	  // Pobieramy kolejne okno
 	  frame = cvQueryFrame(input_video);
-	  if (frame == NULL)
-	  {
-		  /* Why did we get a NULL frame? We shouldn't be at the end. */
+
+	  if (frame == NULL){
 		  fprintf(stderr, "Error: Hmm. The end came sooner than we thought.\n");
 		  return -1;
 	  }
+
 	  /* Allocate another image if not already allocated.
 	  * Image has ONE challenge of color (ie: monochrome) with 8-bit "color" depth.
 	  * This is the image format OpenCV algorithms actually operate on (mostly).
@@ -102,12 +79,12 @@ int main(void)
 	  * AND flip the image vertically. Flip is a shameless hack. OpenCV reads
 	  * in AVIs upside-down by default. (No comment :-))
 	  */
-	  cvConvertImage(frame, frame1_1C, CV_CVTIMG_FLIP);
+	  cvConvertImage(frame, frame1_1C);
 	  /* We'll make a full color backup of this frame so that we can draw on it.
 	  * (It's not the best idea to draw on the static memory space of cvQueryFrame().)
 	  */
 	  allocateOnDemand(&frame1, frame_size, IPL_DEPTH_8U, 3);
-	  cvConvertImage(frame, frame1, CV_CVTIMG_FLIP);
+	  cvConvertImage(frame, frame1);
 	  /* Get the second frame of video. Sample principles as the first. */
 	  frame = cvQueryFrame(input_video);
 	  if (frame == NULL)
@@ -116,7 +93,7 @@ int main(void)
 		  return -1;
 	  }
 	  allocateOnDemand(&frame2_1C, frame_size, IPL_DEPTH_8U, 1);
-	  cvConvertImage(frame, frame2_1C, CV_CVTIMG_FLIP);
+	  cvConvertImage(frame, frame2_1C);
 	  /* Shi and Tomasi Feature Tracking! */
 	  /* Preparation: Allocate the necessary storage. */
 	  allocateOnDemand(&eig_image, frame_size, IPL_DEPTH_32F, 1);
@@ -174,7 +151,7 @@ int main(void)
 	* work pretty well in many situations.
 	*/
 	CvTermCriteria optical_flow_termination_criteria
-		= cvTermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, .3);
+		= cvTermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 40, .3);
 	/* This is some workspace for the algorithm.
 	* (The algorithm actually carves the image into pyramids of different resolutions
 	.)
@@ -229,19 +206,19 @@ int main(void)
 	  q.x = (int)frame2_features[i].x;
 	  q.y = (int)frame2_features[i].y;
 	  double angle; angle = atan2((double)p.y - q.y, (double)p.x - q.x);
-	  double hypotenuse; hypotenuse = sqrt(square(p.y - q.y) + square(p.x - q.x))
-		  ;
-	  /* Here we lengthen the arrow by a factor of three. */
-	  q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
-	  q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
-	  /* Now we draw the main line of the arrow. */
-	  /* "frame1" is the frame to draw on.
-	  * "p" is the point where the line begins.
-	  * "q" is the point where the line stops.
-	  * "CV_AA" means antialiased drawing.
-	  * "0" means no fractional bits in the center cooridinate or radius.
-	  */
-	  if (hypotenuse > 3 && hypotenuse < 30) {
+	  double hypotenuse; hypotenuse = sqrt(square(p.y - q.y) + square(p.x - q.x));
+	  if (hypotenuse > 3 && hypotenuse < 15) {
+		  /* Here we lengthen the arrow by a factor of three. */
+		  q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
+		  q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
+		  /* Now we draw the main line of the arrow. */
+		  /* "frame1" is the frame to draw on.
+		  * "p" is the point where the line begins.
+		  * "q" is the point where the line stops.
+		  * "CV_AA" means antialiased drawing.
+		  * "0" means no fractional bits in the center cooridinate or radius.
+		  */
+	  
 		  cvLine(frame1, p, q, line_color, line_thickness, CV_AA, 0);
 		  /* Now draw the tips of the arrow. I do some scaling so that the
 		  * tips look proportional to the main line of the arrow.
