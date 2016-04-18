@@ -74,7 +74,7 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>C:\Program Files\opencv\build\x64\vc14;$(ExecutablePath)</ExecutablePath>
     <LibraryPath>C:\Program Files\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files\opencv\build\include;$(IncludePath)</IncludePath>
