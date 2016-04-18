@@ -6,10 +6,10 @@
 #include <highgui.h>
 #include <math.h>
 
-#define NOF 1000  //numbers of futures
+#define NOF 500  //numbers of futures
 #define QL 0.1   //quality level
-#define MD 3	 //minimal distance
-#define EBS 3    //eig_block_size
+#define MD 5	 //minimal distance
+#define EBS 2    //eig_block_size
 #define UH 0	 //use harris
 using namespace std;
 using namespace cv;
@@ -57,6 +57,7 @@ int main(void)
 	while (true)
 	{
 		static Mat frame, prevgrayframe, grayframe, frame1;
+
 		cap >> frame;
 
 		if (frame.empty()) {
@@ -67,8 +68,7 @@ int main(void)
 		frame.copyTo(frame1);
 
 		int number_of_features = NOF;
-		cvtColor(frame, grayframe, CV_BGR2GRAY);
-	
+		cvtColor(frame, grayframe, CV_BGR2GRAY);	
 		goodFeaturesToTrack(grayframe, corners[1], NOF, QL, MD, cv::noArray(), EBS, UH);
 
 
@@ -88,10 +88,10 @@ int main(void)
 				CvScalar line_color; line_color = CV_RGB(255, 0, 0);
 				CvPoint p, q;
 
-				p.x = (int)corners[0].at(i).x;
-				p.y = (int)corners[0].at(i).y;
-				q.x = (int)corners[1].at(i).x;
-				q.y = (int)corners[1].at(i).y;
+				p.x = (int)corners[0][i].x;
+				p.y = (int)corners[0][i].y;
+				q.x = (int)corners[1][i].x;
+				q.y = (int)corners[1][i].y;
 
 				double angle = atan2((double)p.y - q.y, (double)p.x - q.x);
 				double hypotenuse = sqrt(square(p.y - q.y) + square(p.x - q.x));
@@ -124,5 +124,6 @@ int main(void)
 		if (current_frame < 0) current_frame = 0;
 		if (current_frame >= number_of_frames - 1) current_frame = 0;
 		corners[1].swap(corners[0]);
+		cv::swap(prevgrayframe, grayframe);
 	}
 }
