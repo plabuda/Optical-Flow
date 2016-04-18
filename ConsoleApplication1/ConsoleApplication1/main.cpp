@@ -41,43 +41,43 @@ int main(void)
 			break;
 		}
 		number_of_frames++;
+	}
+
+	cap.open("Highway.avi");
+
+	if (!cap.isOpened()) {
+		cout << "Cannot open the video file" << endl;
+		return -1;
+	}
+
+	namedWindow("Optical Flow", CV_WINDOW_AUTOSIZE);
 
 
-		cap.open("Highway.avi");
+	while (true)
+	{
+		static Mat frame, prevgrayframe, grayframe, frame1;
 
-		if (!cap.isOpened()) {
-			cout << "Cannot open the video file" << endl;
+		cap >> frame;
+
+		if (frame.empty()) {
+			fprintf(stderr, "Error: Hmm. The end came sooner than we thought.\n");
 			return -1;
 		}
 
-		namedWindow("Optical Flow", CV_WINDOW_AUTOSIZE);
 
+		frame.copyTo(frame1);
 
-		while (true)
-		{
-			static Mat frame, prevgrayframe, grayframe, frame1;
+		int number_of_features = NOF;
+		cvtColor(frame, grayframe, CV_BGR2GRAY);
+		goodFeaturesToTrack(grayframe, corners[1], NOF, QL, MD, cv::noArray(), EBS, UH);
+		if (prevgrayframe.empty())
+			grayframe.copyTo(prevgrayframe);
+		vector<uchar> status;
+		vector<float> err;
+		if (!prevgrayframe.empty() && !grayframe.empty() && !corners[0].empty())
+			calcOpticalFlowPyrLK(prevgrayframe, grayframe, corners[0], corners[1], status, err, winSize, 3, termcrit, 0, 0.001);
 
-			cap >> frame;
-
-			if (frame.empty()) {
-				fprintf(stderr, "Error: Hmm. The end came sooner than we thought.\n");
-				return -1;
-			}
-
-			frame.copyTo(frame1);
-
-			int number_of_features = NOF;
-			cvtColor(frame, grayframe, CV_BGR2GRAY);
-			goodFeaturesToTrack(grayframe, corners[1], NOF, QL, MD, cv::noArray(), EBS, UH);
-
-			if (prevgrayframe.empty())
-				grayframe.copyTo(prevgrayframe);
-
-			vector<uchar> status;
-			vector<float> err;
-			if (!prevgrayframe.empty() && !grayframe.empty() && !corners[0].empty())
-				calcOpticalFlowPyrLK(prevgrayframe, grayframe, corners[0], corners[1], status, err, winSize, 3, termcrit, 0, 0.001);
-
+		if (!corners[0].empty())
 			/* For fun (and debugging :)), let's draw the flow field. */
 			for (int i = 0; i < number_of_features; i++)
 			{
@@ -94,11 +94,10 @@ int main(void)
 				by a factor of 3.
 				*/
 				CvPoint p, q;
-				p.x = (int)corners[0].at(i).x;
-				p.y = (int)corners[0].at(i).y;
-				q.x = (int)corners[1].at(i).x;
-				q.y = (int)corners[1].at(i).y;
-
+				p.x = (int)corners[0][i].x;
+				p.y = (int)corners[0][i].y;
+				q.x = (int)corners[1][i].x;
+				q.y = (int)corners[1][i].y;
 				double angle; angle = atan2((double)p.y - q.y, (double)p.x - q.x);
 				double hypotenuse; hypotenuse = sqrt(square(p.y - q.y) + square(p.x - q.x));
 				if (hypotenuse > 3 && hypotenuse < 15) {
@@ -112,7 +111,6 @@ int main(void)
 					* "CV_AA" means antialiased drawing.
 					* "0" means no fractional bits in the center cooridinate or radius.
 					*/
-
 					line(frame1, p, q, line_color, line_thickness, CV_AA, 0);
 					/* Now draw the tips of the arrow. I do some scaling so that the
 					* tips look proportional to the main line of the arrow.
@@ -125,29 +123,28 @@ int main(void)
 					line(frame1, p, q, line_color, line_thickness, CV_AA, 0);
 				}
 			}
-			/* Now display the image we drew on. Recall that "Optical Flow" is the name of
-			* the window we created above.
-			*/
-			imshow("Optical Flow", frame1);
-			/* And wait for the user to press a key (so the user has time to look at the
-			image).
-			* If the argument is 0 then it waits forever otherwise it waits that number of
-			milliseconds.
-			* The return value is the key the user pressed.
-			*/
-			int key_pressed;
-			key_pressed = waitKey(1);
-			if (key_pressed == 'q') {
-				break;
-			}
-			/* If the users pushes "b" or "B" go back one frame.
-			* Otherwise go forward one frame.
-			*/
-			current_frame++;
-			/* Don't run past the front/end of the AVI. */
-			if (current_frame < 0) current_frame = 0;
-			if (current_frame >= number_of_frames - 1) current_frame = 0;
+		/* Now display the image we drew on. Recall that "Optical Flow" is the name of
+		* the window we created above.
+		*/
+		imshow("Optical Flow", frame1);
+		/* And wait for the user to press a key (so the user has time to look at the
+		image).
+		* If the argument is 0 then it waits forever otherwise it waits that number of
+		milliseconds.
+		* The return value is the key the user pressed.
+		*/
+		int key_pressed;
+		key_pressed = waitKey(1);
+		if (key_pressed == 'q') {
+			break;
 		}
+		/* If the users pushes "b" or "B" go back one frame.
+		* Otherwise go forward one frame.
+		*/
+		current_frame++;
+		/* Don't run past the front/end of the AVI. */
+		if (current_frame < 0) current_frame = 0;
+		if (current_frame >= number_of_frames - 1) current_frame = 0;
 		swap(corners[1], corners[0]);
 	}
 }
