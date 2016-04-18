@@ -22,13 +22,6 @@ inline static double square(int a)
 
 int main(void)
 {
-	CvCapture *input_video = cvCaptureFromFile("E:\\Highway.avi");
-
-	if (input_video == NULL) {
-		fprintf(stderr, "Error: Can't open video.\n");
-		return -1;
-	}
-
 	//Obliczamy ilosc klatek w filmie
 	long number_of_frames = 0, current_frame = 0;
 	vector<Point2f> corners[2];
@@ -38,7 +31,7 @@ int main(void)
 	TermCriteria termcrit(TermCriteria::COUNT | TermCriteria::EPS, 20, 0.03);
 	VideoCapture cap;
 
-	cap.open("E:\\Highway.avi");
+	cap.open("Highway.avi");
 
 	while (true) {
 		cap >> framet;
@@ -48,7 +41,7 @@ int main(void)
 		number_of_frames++;
 
 
-		cap.open("E:\\Highway.avi");
+		cap.open("Highway.avi");
 
 		if (!cap.isOpened()) {
 			cout << "Cannot open the video file" << endl;
