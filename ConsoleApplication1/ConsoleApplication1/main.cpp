@@ -1,4 +1,5 @@
 
+
 #include "stdafx.h"
 #include <cv.h>
 #include "opencv2/opencv.hpp"
@@ -22,6 +23,7 @@ inline static double square(int a)
 
 int main(void)
 {
+
 	//Obliczamy ilosc klatek w filmie
 	long number_of_frames = 0, current_frame = 0;
 	vector<Point2f> corners[2];
@@ -56,7 +58,6 @@ int main(void)
 			static Mat frame, prevgrayframe, grayframe, frame1;
 
 			cap >> frame;
-			if (frame.empty()) continue;
 
 			if (frame.empty()) {
 				fprintf(stderr, "Error: Hmm. The end came sooner than we thought.\n");
@@ -65,25 +66,16 @@ int main(void)
 
 			frame.copyTo(frame1);
 
-			if (frame.empty())
-			{
-				fprintf(stderr, "Error: Hmm. The end came sooner than we thought.\n");
-				return -1;
-			}
-			frame.copyTo(grayframe);
-
 			int number_of_features = NOF;
 			cvtColor(frame, grayframe, CV_BGR2GRAY);
 			goodFeaturesToTrack(grayframe, corners[1], NOF, QL, MD, cv::noArray(), EBS, UH);
-
-			CvPoint2D32f frame2_features[NOF];
 
 			if (prevgrayframe.empty())
 				grayframe.copyTo(prevgrayframe);
 
 			vector<uchar> status;
 			vector<float> err;
-			if (!prevgrayframe.empty() && !grayframe.empty())
+			if (!prevgrayframe.empty() && !grayframe.empty() && !corners[0].empty())
 				calcOpticalFlowPyrLK(prevgrayframe, grayframe, corners[0], corners[1], status, err, winSize, 3, termcrit, 0, 0.001);
 
 			/* For fun (and debugging :)), let's draw the flow field. */
@@ -156,5 +148,6 @@ int main(void)
 			if (current_frame < 0) current_frame = 0;
 			if (current_frame >= number_of_frames - 1) current_frame = 0;
 		}
+		swap(corners[1], corners[0]);
 	}
 }
