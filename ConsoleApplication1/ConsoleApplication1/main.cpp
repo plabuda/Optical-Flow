@@ -23,8 +23,10 @@ int main(void)
 	}
 
 	namedWindow("Optical Flow", CV_WINDOW_AUTOSIZE);
-	mMinWindow minFrame = mMinWindow(400, 500, 200, 400, winSize, subPixWinSize, termcrit);
-
+	mMinWindow mMinFrame = mMinWindow(400, 500, 100, 400, winSize, subPixWinSize, termcrit);
+	mMinWindow mMinFrame1 = mMinWindow(1400, 500, 100, 400, winSize, subPixWinSize, termcrit);
+	
+	cv::Mat mFrame_Wrapper(cv::Size(250, 400), CV_8UC3);
 
 	while (true)
 	{
@@ -33,14 +35,19 @@ int main(void)
 		cap >> frame;
 
 		if (frame.empty()) {
-			fprintf(stderr, "Error: Hmm. The end came sooner than we thought.\n");
+			fprintf(stderr, "End of video");
 			return -1;
 		}
 
-		imshow("Optical Flow", minFrame.drawVectors(frame));
+		mMinFrame.drawVectors(frame).copyTo(mFrame_Wrapper(cv::Rect(0, 0, 100, 400)));
+		mMinFrame1.drawVectors(frame).copyTo(mFrame_Wrapper(cv::Rect(150, 0, 100, 400)));
+
+		imshow("Optical Flow", mFrame_Wrapper);
 		int key_pressed = waitKey(1);
 		if (key_pressed == 'q') {
 			break;
 		}	
 	}
+
+	return 0;
 }
