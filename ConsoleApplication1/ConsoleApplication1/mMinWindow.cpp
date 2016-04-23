@@ -16,12 +16,22 @@ mMinWindow::mMinWindow(int xv, int yv, int wv, int hv, cv::Size winSizev, cv::Si
 	subPixWinSize = subPixWinSizev;
 	termcrit = termcritv;
 
-	rng = cv::RNG(12345);
+	rng = cv::RNG(123);
 }
 
 
 mMinWindow::~mMinWindow()
 {
+}
+
+int mMinWindow::getWidth()
+{
+	return w;
+}
+
+int mMinWindow::getHeigth()
+{
+	return h;
 }
 
 inline double  mMinWindow::square(int a)
@@ -68,7 +78,7 @@ cv::Mat mMinWindow::drawVectors(cv::Mat frame)
 
 			double angle = atan2((double)p.y - q.y, (double)p.x - q.x);
 			double hypotenuse = sqrt(square(p.y - q.y) + square(p.x - q.x));
-			circle(mColorFrame, corners[0][i], 5, cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255)), -1, 8, 0);
+			circle(mColorFrame, corners[0][i], 5, cv::Scalar(255, 0, 255), -1, 8, 0);
 
 			if (hypotenuse > 3 && hypotenuse < 15) {
 

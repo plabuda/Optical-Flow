@@ -24,6 +24,9 @@ public:
 	mMinWindow(int, int, int, int, cv::Size, cv::Size, cv::TermCriteria);
 	~mMinWindow();
 
+	int getWidth();
+	int getHeigth();
+
 	inline double square(int);
 	cv::Mat drawVectors(cv::Mat);
 
