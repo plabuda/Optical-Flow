@@ -6,7 +6,7 @@
 #include <highgui.h>
 #include <math.h>
 
-#define NOF 1000  //numbers of futures
+#define NOF 500  //numbers of futures
 #define QL 0.1   //quality level
 #define MD 3	 //minimal distance
 #define EBS 3    //eig_block_size
