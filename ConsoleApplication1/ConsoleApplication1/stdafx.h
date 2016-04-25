@@ -1,12 +1,9 @@
-// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently, but
-// are changed infrequently
-//
-
 #pragma once
 
 #include "targetver.h"
 
+
+/*Optical FLow operands*/
 #define NOF 100  //numbers of futures
 #define QL 0.1   //quality level
 #define MD 3	 //minimal distance
@@ -21,6 +18,5 @@ static const double pi = 3.14159265358979323846;
 #include "opencv2/opencv.hpp"
 #include <highgui.h>
 
+#include "package_bgs\jmo\MultiLayerBGS.h"
 
-
-// TODO: reference additional headers your program requires here

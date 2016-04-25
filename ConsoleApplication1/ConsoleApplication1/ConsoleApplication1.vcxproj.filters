@@ -27,7 +27,7 @@
     <ClInclude Include="mMinWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HaarCascade.h">
+    <ClInclude Include="BGS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,7 +41,7 @@
     <ClCompile Include="mMinWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HaarCascade.cpp">
+    <ClCompile Include="BGS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

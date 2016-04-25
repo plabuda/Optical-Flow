@@ -77,7 +77,7 @@
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>C:\Program Files\opencv\build\x64\vc14;$(ExecutablePath)</ExecutablePath>
     <LibraryPath>C:\Program Files\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Program Files\opencv\build\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Mich\Source\Repos\Optical-Flow\ConsoleApplication1\ConsoleApplication1\package_bgs\jmo;C:\Program Files\opencv\build\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -160,13 +160,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HaarCascade.h" />
+    <ClInclude Include="BGS.h" />
     <ClInclude Include="mMinWindow.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="HaarCascade.cpp" />
+    <ClCompile Include="BGS.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mMinWindow.cpp" />
     <ClCompile Include="stdafx.cpp">
