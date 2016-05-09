@@ -52,6 +52,8 @@ along with BGSLibrary.  If not, see <http://www.gnu.org/licenses/>.
         MODIFICATIONS (Modification, Author, Date):
 
         **************************************************************************/
+
+
 #pragma once
 
 #if !defined(_CLASSE_BLOBRESULT_INCLUDED)

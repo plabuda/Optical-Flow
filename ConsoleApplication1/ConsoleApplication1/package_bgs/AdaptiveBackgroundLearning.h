@@ -15,7 +15,6 @@ You should have received a copy of the GNU General Public License
 along with BGSLibrary.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
-
 #include <iostream>
 #include <opencv2/opencv.hpp>
 

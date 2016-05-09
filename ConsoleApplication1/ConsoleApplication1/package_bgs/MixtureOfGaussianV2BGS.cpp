@@ -14,7 +14,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with BGSLibrary.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include "MixtureOfGaussianV2BGS.h"
+#include <cv.h>
+#include "opencv2/opencv.hpp"
+#include <highgui.h>
 
 MixtureOfGaussianV2BGS::MixtureOfGaussianV2BGS() : firstTime(true), alpha(0.05), enableThreshold(true), threshold(15), showOutput(true)
 {

@@ -44,6 +44,8 @@ along with BGSLibrary.  If not, see <http://www.gnu.org/licenses/>.
 //
 //////////////////////////////////////////////////////////////////////
 
+
+
 #if !defined(_MULTI_LAYER_BGS_H_)
 #define _MULTI_LAYER_BGS_H_
 

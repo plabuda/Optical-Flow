@@ -1,9 +1,10 @@
 
 
-#include "stdafx.h"
 #include <math.h>
 #include "mMinWindow.h"
-
+#include <cv.h>
+#include "opencv2/opencv.hpp"
+#include <highgui.h>
 // haar cascade !!!!!!!!!!!!!
 
 using namespace std;

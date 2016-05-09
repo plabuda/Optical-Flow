@@ -13,28 +13,79 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\package_bgs">
+      <UniqueIdentifier>{5e0a6e5e-588c-4fc2-8d58-f570220b5d05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\package_bgs\jmo">
+      <UniqueIdentifier>{6fef5323-59aa-4b64-bc19-a4429cb3b299}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mMinWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BGS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\AdaptiveSelectiveBackgroundLearning.h">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\FrameDifferenceBGS.h">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\GMG.h">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\IBGS.h">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\StaticFrameDifferenceBGS.h">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\WeightedMovingMeanBGS.h">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\WeightedMovingVarianceBGS.h">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\AdaptiveBackgroundLearning.h">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\blobresult.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\CMultiLayerBGS.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\LocalBinaryPattern.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\MultiLayerBGS.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\OpenCvDataConversion.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\BackgroundSubtractionAPI.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\BGS.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\blob.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\BlobExtraction.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\jmo\BlobLibraryConfiguration.h">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,6 +94,45 @@
     </ClCompile>
     <ClCompile Include="BGS.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\AdaptiveSelectiveBackgroundLearning.cpp">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\FrameDifferenceBGS.cpp">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\GMG.cpp">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\StaticFrameDifferenceBGS.cpp">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\WeightedMovingMeanBGS.cpp">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\WeightedMovingVarianceBGS.cpp">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\AdaptiveBackgroundLearning.cpp">
+      <Filter>Header Files\package_bgs</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\jmo\BlobResult.cpp">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\jmo\CMultiLayerBGS.cpp">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\jmo\LocalBinaryPattern.cpp">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\jmo\MultiLayerBGS.cpp">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\jmo\blob.cpp">
+      <Filter>Header Files\package_bgs\jmo</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\jmo\BlobExtraction.cpp">
+      <Filter>Header Files\package_bgs\jmo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

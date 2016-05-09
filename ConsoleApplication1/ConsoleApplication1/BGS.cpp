@@ -1,6 +1,10 @@
-#include "stdafx.h"
-#include "BGS.h"
 
+#include "BGS.h"
+#include "Config.h"
+#include <cv.h>
+#include "opencv2/opencv.hpp"
+#include <highgui.h>
+#include "package_bgs\jmo\MultiLayerBGS.h"
 
 BGS::BGS()
 {

@@ -75,9 +75,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <ExecutablePath>C:\Program Files\opencv\build\x64\vc14;$(ExecutablePath)</ExecutablePath>
-    <LibraryPath>C:\Program Files\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Users\Mich\Source\Repos\Optical-Flow\ConsoleApplication1\ConsoleApplication1\package_bgs\jmo;C:\Program Files\opencv\build\include;$(IncludePath)</IncludePath>
+    <ExecutablePath>C:\Program Files\opencv\build\x84\vc12;$(ExecutablePath)</ExecutablePath>
+    <LibraryPath>C:\Program Files\opencv\build\x84\vc12\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\opencv\build\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -105,15 +105,23 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Program Files\opencv\build\include\opencv;C:\Program Files\opencv\build\include\opencv2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OmitFramePointers>false</OmitFramePointers>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Program Files\opencv\build\x64\vc14\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world310d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Program Files\opencv\build\x86\vc12\staticlib\*.lib;comctl32.lib;VFW32.lib;;%(AdditionalDependencies)</AdditionalDependencies>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -157,24 +165,45 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="BGS.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="mMinWindow.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
+    <ClInclude Include="package_bgs\AdaptiveBackgroundLearning.h" />
+    <ClInclude Include="package_bgs\AdaptiveSelectiveBackgroundLearning.h" />
+    <ClInclude Include="package_bgs\FrameDifferenceBGS.h" />
+    <ClInclude Include="package_bgs\GMG.h" />
+    <ClInclude Include="package_bgs\IBGS.h" />
+    <ClInclude Include="package_bgs\jmo\BackgroundSubtractionAPI.h" />
+    <ClInclude Include="package_bgs\jmo\BGS.h" />
+    <ClInclude Include="package_bgs\jmo\blob.h" />
+    <ClInclude Include="package_bgs\jmo\BlobExtraction.h" />
+    <ClInclude Include="package_bgs\jmo\BlobLibraryConfiguration.h" />
+    <ClInclude Include="package_bgs\jmo\blobresult.h" />
+    <ClInclude Include="package_bgs\jmo\CMultiLayerBGS.h" />
+    <ClInclude Include="package_bgs\jmo\LocalBinaryPattern.h" />
+    <ClInclude Include="package_bgs\jmo\MultiLayerBGS.h" />
+    <ClInclude Include="package_bgs\jmo\OpenCvDataConversion.h" />
+    <ClInclude Include="package_bgs\StaticFrameDifferenceBGS.h" />
+    <ClInclude Include="package_bgs\WeightedMovingMeanBGS.h" />
+    <ClInclude Include="package_bgs\WeightedMovingVarianceBGS.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BGS.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mMinWindow.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="package_bgs\AdaptiveBackgroundLearning.cpp" />
+    <ClCompile Include="package_bgs\AdaptiveSelectiveBackgroundLearning.cpp" />
+    <ClCompile Include="package_bgs\FrameDifferenceBGS.cpp" />
+    <ClCompile Include="package_bgs\GMG.cpp" />
+    <ClCompile Include="package_bgs\jmo\blob.cpp" />
+    <ClCompile Include="package_bgs\jmo\BlobExtraction.cpp" />
+    <ClCompile Include="package_bgs\jmo\BlobResult.cpp" />
+    <ClCompile Include="package_bgs\jmo\CMultiLayerBGS.cpp" />
+    <ClCompile Include="package_bgs\jmo\LocalBinaryPattern.cpp" />
+    <ClCompile Include="package_bgs\jmo\MultiLayerBGS.cpp" />
+    <ClCompile Include="package_bgs\StaticFrameDifferenceBGS.cpp" />
+    <ClCompile Include="package_bgs\WeightedMovingMeanBGS.cpp" />
+    <ClCompile Include="package_bgs\WeightedMovingVarianceBGS.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

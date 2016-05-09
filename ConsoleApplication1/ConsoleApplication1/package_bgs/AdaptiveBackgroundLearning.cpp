@@ -14,7 +14,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with BGSLibrary.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include "AdaptiveBackgroundLearning.h"
+
 
 AdaptiveBackgroundLearning::AdaptiveBackgroundLearning() : firstTime(true), alpha(0.05), limit(-1), counter(0), minVal(0.0), maxVal(1.0), 
   enableThreshold(true), threshold(15), showForeground(true), showBackground(true)

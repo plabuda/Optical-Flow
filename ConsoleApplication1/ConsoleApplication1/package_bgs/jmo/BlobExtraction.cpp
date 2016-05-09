@@ -70,7 +70,6 @@ along with BGSLibrary.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "BlobResult.h"
 #include "BlobExtraction.h"
-#include <opencv2/legacy/compat.hpp>
 
 namespace Blob
 {

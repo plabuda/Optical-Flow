@@ -43,6 +43,7 @@ along with BGSLibrary.  If not, see <http://www.gnu.org/licenses/>.
 // OpencvDataConversion.h: interface for the COpencvDataConversion class.
 //
 //////////////////////////////////////////////////////////////////////
+#include "../../stdafx.h"
 
 #if !defined(_OPENCV_DATA_CONVERSION_H_)
 #define _OPENCV_DATA_CONVERSION_H_

@@ -1,6 +1,8 @@
-#include "stdafx.h"
-#include "mMinWindow.h"
 
+#include "mMinWindow.h"
+#include <cv.h>
+#include "opencv2/opencv.hpp"
+#include <highgui.h>
 mMinWindow::mMinWindow()
 {
 }
