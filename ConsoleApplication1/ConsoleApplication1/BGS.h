@@ -1,4 +1,7 @@
 #pragma once
+#include "BGSProduct.h"
+#include <vector>
+
 class BGS
 {
 private:
@@ -8,10 +11,12 @@ private:
 	int h;
 
 	cv::RNG rng;
-	cv::Rect rRect;
+	cv::Rect rRect, rCntRect;
 
 	cv::Ptr<cv::BackgroundSubtractorMOG2> pMOG2;
-	cv::Mat  mColorFrame, mMask;
+	cv::Mat  mColorFrame, mMask, mThresholdOutput, mMaskG;
+	std::vector<cv::Vec4i> hierarchy;
+	std::vector<std::vector<cv::Point>> contours;
 
 public:
 	BGS();
@@ -21,6 +26,6 @@ public:
 private:
 
 public:
-	cv::Mat drawSquare(cv::Mat);
+	cv::Mat* drawSquare(cv::Mat mColorFrameArg);
 };
 
