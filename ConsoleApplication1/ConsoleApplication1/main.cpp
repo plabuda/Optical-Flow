@@ -4,6 +4,7 @@
 #include <math.h>
 #include "mMinWindow.h"
 #include "BGS.h"
+#include "BGSProduct.h"
 
 // haar cascade !!!!!!!!!!!!!
 
@@ -15,7 +16,8 @@ int main(void)
 	Size winSize(15, 15), subPixWinSize(15, 15);
 	TermCriteria termcrit(TermCriteria::COUNT | TermCriteria::EPS, 20, 0.3);
 	Mat mFrame0, mFrame1, mFrame2, mFrame3, frame;
-
+	Mat* result1;
+	Mat* result2;
 	VideoCapture cap;
 
 	cap.open("highway.avi");
@@ -29,12 +31,17 @@ int main(void)
 	
 	mMinWindow mMinFrame0 = mMinWindow(710, 550, 150, 300, winSize, subPixWinSize, termcrit);
 	mMinWindow mMinFrame1 = mMinWindow(1150, 500, 150, 300, winSize, subPixWinSize, termcrit);
-	BGS bgsFrame0 = BGS(710, 550, 150, 300, 30, 20, true);
-	BGS bgsFrame1 = BGS(1150, 500, 150, 300, 30, 20, true);
+	BGS bgsFrame0 = BGS(710, 550, 150, 300, 30, 20, false);
+	BGS bgsFrame1 = BGS(1150, 500, 150, 300, 30, 20, false);
 	cv::Mat mFrame_Wrapper(
 		cv::Size(mMinFrame0.getWidth() * 2 + 50,
 				 mMinFrame0.getHeigth()), 
 				 CV_8UC3);
+
+	cv::Mat mFrame_Wrapper_Counturs(
+		cv::Size(mMinFrame0.getWidth() * 2 + 50,
+			mMinFrame0.getHeigth()),
+		CV_8UC3);
 
 	cv::Mat mFrame_Wrapper_Mask(
 		cv::Size(mMinFrame0.getWidth() * 2 + 50,
@@ -74,8 +81,8 @@ int main(void)
 					mMinFrame1.getWidth(),
 					mMinFrame1.getHeigth())));
 		}
-		
-		mFrame2 = bgsFrame0.drawSquare(frame);
+		result1 = bgsFrame0.drawSquare(frame);
+		mFrame2 = result1[0];
 		if (!mFrame2.empty()) {
 		mFrame2.copyTo(mFrame_Wrapper_Mask(
 			cv::Rect(
@@ -84,10 +91,31 @@ int main(void)
 				mFrame2.cols,
 				mFrame2.rows)));
 		}
-	
-		mFrame3 = bgsFrame1.drawSquare(frame);
+
+		result2 = bgsFrame1.drawSquare(frame);
+		mFrame3 = result2[0];
 		if (!mFrame3.empty()) {
 			mFrame3.copyTo(mFrame_Wrapper_Mask(
+				cv::Rect(
+					mMinFrame0.getWidth() + 50,
+					0,
+					mFrame3.cols,
+					mFrame3.rows)));
+		}
+
+		mFrame2 = result1[1];
+		if (!mFrame2.empty()) {
+			mFrame2.copyTo(mFrame_Wrapper_Counturs(
+				cv::Rect(
+					0,
+					0,
+					mFrame2.cols,
+					mFrame2.rows)));
+		}
+
+		mFrame3 = result2[1];
+		if (!mFrame3.empty()) {
+			mFrame3.copyTo(mFrame_Wrapper_Counturs(
 				cv::Rect(
 					mMinFrame0.getWidth() + 50,
 					0,
@@ -98,7 +126,7 @@ int main(void)
 		
 		imshow("Optical Flow", mFrame_Wrapper);
 		imshow("Mask", mFrame_Wrapper_Mask);
-
+		imshow("Counturs", mFrame_Wrapper_Counturs);
 		int key_pressed = waitKey(1);
 		if (key_pressed == 'q') break;
 			
