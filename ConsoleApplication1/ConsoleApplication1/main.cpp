@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include <math.h>
 #include "mMinWindow.h"
+#include "BGS.h"
 
 // haar cascade !!!!!!!!!!!!!
 
@@ -13,10 +14,11 @@ int main(void)
 {
 	Size winSize(15, 15), subPixWinSize(15, 15);
 	TermCriteria termcrit(TermCriteria::COUNT | TermCriteria::EPS, 20, 0.3);
+	Mat mFrame0, mFrame1, mFrame2, mFrame3, frame;
 
 	VideoCapture cap;
 
-	cap.open("Highway.avi");
+	cap.open("highway.avi");
 
 	if (!cap.isOpened()) {
 		cout << "Cannot open the video file" << endl;
@@ -24,14 +26,26 @@ int main(void)
 	}
 
 	namedWindow("Optical Flow", CV_WINDOW_AUTOSIZE);
-	mMinWindow mMinFrame = mMinWindow(710, 550, 150, 300, winSize, subPixWinSize, termcrit);
-	mMinWindow mMinFrame1 = mMinWindow(1150, 500, 150, 300, winSize, subPixWinSize, termcrit);
 	
-	cv::Mat mFrame_Wrapper(cv::Size(mMinFrame.getWidth() + mMinFrame.getWidth() + 50, mMinFrame.getHeigth()), CV_8UC3);
+	mMinWindow mMinFrame0 = mMinWindow(710, 550, 150, 300, winSize, subPixWinSize, termcrit);
+	mMinWindow mMinFrame1 = mMinWindow(1150, 500, 150, 300, winSize, subPixWinSize, termcrit);
+	BGS bgsFrame0 = BGS(710, 550, 150, 300, 30, 20, true);
+	BGS bgsFrame1 = BGS(1150, 500, 150, 300, 30, 20, true);
+	cv::Mat mFrame_Wrapper(
+		cv::Size(mMinFrame0.getWidth() * 2 + 50,
+				 mMinFrame0.getHeigth()), 
+				 CV_8UC3);
+
+	cv::Mat mFrame_Wrapper_Mask(
+		cv::Size(mMinFrame0.getWidth() * 2 + 50,
+				 mMinFrame0.getHeigth()),
+			     CV_8UC1);
+	
+	cap >> frame;
 
 	while (true)
 	{
-		static Mat frame;
+	
 
 		cap >> frame;
 
@@ -40,14 +54,54 @@ int main(void)
 			return -1;
 		}
 
-		mMinFrame.drawVectors(frame).copyTo(mFrame_Wrapper(cv::Rect(0, 0, mMinFrame.getWidth(), mMinFrame.getHeigth())));
-		mMinFrame1.drawVectors(frame).copyTo(mFrame_Wrapper(cv::Rect(mMinFrame.getWidth() + 50, 0, mMinFrame1.getWidth(), mMinFrame1.getHeigth())));
+		
+		mFrame0 = mMinFrame0.drawVectors(frame);
+		if (!mFrame0.empty()) {
+			mFrame0.copyTo(mFrame_Wrapper(
+				cv::Rect(
+					0,
+					0,
+					mMinFrame0.getWidth(),
+					mMinFrame0.getHeigth())));
+		}
 
+		mFrame1 = mMinFrame1.drawVectors(frame);
+		if (!mFrame1.empty()) {
+			mFrame1.copyTo(mFrame_Wrapper(
+				cv::Rect(
+					mMinFrame0.getWidth() + 50,
+					0,
+					mMinFrame1.getWidth(),
+					mMinFrame1.getHeigth())));
+		}
+		
+		mFrame2 = bgsFrame0.drawSquare(frame);
+		if (!mFrame2.empty()) {
+		mFrame2.copyTo(mFrame_Wrapper_Mask(
+			cv::Rect(
+				0,
+				0,
+				mFrame2.cols,
+				mFrame2.rows)));
+		}
+	
+		mFrame3 = bgsFrame1.drawSquare(frame);
+		if (!mFrame3.empty()) {
+			mFrame3.copyTo(mFrame_Wrapper_Mask(
+				cv::Rect(
+					mMinFrame0.getWidth() + 50,
+					0,
+					mFrame3.cols,
+					mFrame3.rows)));
+		}
+	
+		
 		imshow("Optical Flow", mFrame_Wrapper);
+		imshow("Mask", mFrame_Wrapper_Mask);
+
 		int key_pressed = waitKey(1);
-		if (key_pressed == 'q') {
-			break;
-		}	
+		if (key_pressed == 'q') break;
+			
 	}
 
 	return 0;
