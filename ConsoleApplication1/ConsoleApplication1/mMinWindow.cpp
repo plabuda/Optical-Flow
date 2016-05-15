@@ -1,22 +1,25 @@
 #include "stdafx.h"
 #include "mMinWindow.h"
 
+using namespace cv;
+using namespace std;
+
 mMinWindow::mMinWindow()
 {
 }
 
-mMinWindow::mMinWindow(int xv, int yv, int wv, int hv, cv::Size winSizev, cv::Size subPixWinSizev, cv::TermCriteria termcritv) {
+mMinWindow::mMinWindow(int xv, int yv, int wv, int hv, Size winSizev, Size subPixWinSizev, TermCriteria termcritv) {
 	x = xv;
 	y = yv;
 	w = wv;
 	h = hv;
-	rRect = cv::Rect(xv, yv, wv, hv);
+	rRect = Rect(xv, yv, wv, hv);
 
 	winSize = winSizev;
 	subPixWinSize = subPixWinSizev;
 	termcrit = termcritv;
 
-	rng = cv::RNG(123);
+	rng = RNG(123);
 }
 
 
@@ -40,7 +43,7 @@ inline double  mMinWindow::square(int a)
 }
 
 
-cv::Mat mMinWindow::drawVectors(cv::Mat frame)
+cv::Mat mMinWindow::drawVectors(Mat frame)
 {
 	if (iRefreshCounter == 15) {
 		corners[1].clear();
@@ -51,10 +54,10 @@ cv::Mat mMinWindow::drawVectors(cv::Mat frame)
 		iRefreshCounter++;
 	}
 
-	mColorFrame = frame(rRect);
-	cv::cvtColor(mColorFrame, mGrayFrame, cv::COLOR_BGR2GRAY);
-	goodFeaturesToTrack(mGrayFrame, corners[1], NOF, QL, MD, cv::Mat(), EBS, UH, EV);
-	cornerSubPix(mGrayFrame, corners[1], subPixWinSize, cv::Size(-1, -1), termcrit);
+	frame(rRect).copyTo(mColorFrame);
+	cvtColor(mColorFrame, mGrayFrame, cv::COLOR_BGR2GRAY);
+	goodFeaturesToTrack(mGrayFrame, corners[1], NOF, QL, MD, Mat(), EBS, UH, EV);
+	cornerSubPix(mGrayFrame, corners[1], subPixWinSize, Size(-1, -1), termcrit);
 
 	if (mPrevGrayFrame.empty())
 		mGrayFrame.copyTo(mPrevGrayFrame);
@@ -78,27 +81,27 @@ cv::Mat mMinWindow::drawVectors(cv::Mat frame)
 
 			double angle = atan2((double)p.y - q.y, (double)p.x - q.x);
 			double hypotenuse = sqrt(square(p.y - q.y) + square(p.x - q.x));
-			circle(mColorFrame, corners[0][i], 5, cv::Scalar(255, 0, 255), -1, 8, 0);
+			circle(mColorFrame, corners[0][i], 5, Scalar(255, 0, 255), -1, 8, 0);
 
 			if (hypotenuse > 3 && hypotenuse < 15) {
 
 				q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
 				q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
 
-				cv::line(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0);
+				line(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0);
 
 				p.x = (int)(q.x + 9 * cos(angle + pi / 4));
 				p.y = (int)(q.y + 9 * sin(angle + pi / 4));
-				cv::line(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0);
+				line(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0);
 				p.x = (int)(q.x + 9 * cos(angle - pi / 4));
 				p.y = (int)(q.y + 9 * sin(angle - pi / 4));
-				cv::line(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0);
+				line(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0);
 			}
 
 		}
 
 	corners[1].swap(corners[0]);
-	cv::swap(mPrevGrayFrame, mGrayFrame);
+	swap(mPrevGrayFrame, mGrayFrame);
 
 	return mColorFrame;
 }
