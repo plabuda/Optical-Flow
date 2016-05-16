@@ -102,6 +102,6 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
 
 	corners[1].swap(corners[0]);
 	swap(mPrevGrayFrame, mGrayFrame);
-
+	mGrayFrame.deallocate();
 	return mColorFrame;
 }
