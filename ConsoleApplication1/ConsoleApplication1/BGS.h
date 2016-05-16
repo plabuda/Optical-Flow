@@ -1,5 +1,6 @@
 #pragma once
 #include "BGSProduct.h"
+#include "Vehicle.h"
 #include <vector>
 
 class BGS
@@ -17,7 +18,8 @@ private:
 
 	std::vector<cv::Vec4i> hierarchy;
 	std::vector<std::vector<cv::Point>> vvpContours;
-	std::vector<cv::Rect> vrRects, vrPrevRects;
+	//std::vector<cv::Rect> vrRects, vrPrevRects;
+	std::vector<Vehicle> vrVehicles, vrPrevVehicles;
 	
 public:
 	BGS();

@@ -28,7 +28,7 @@ BGS::~BGS()
 
 cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg)
 {
-	vrRects.clear();
+	vrVehicles.clear();
 	mColorFrameArg(rRect).copyTo(mColorFrame);
 	pMOG2->apply(mColorFrame, mMask, 0.001);
 	ret[0] = mMask;
@@ -44,15 +44,28 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg)
 						
 			if (r0.area() > 4000) {
 				Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
-				vrRects.push_back(r0);
-				if (!vrPrevRects.empty()) {
-					std::vector<cv::Rect>::iterator itcR = vrPrevRects.begin();
-					while (itcR != vrPrevRects.end()) {
-						cv::Rect tempr = *itcR;
-						if (tempr.contains(temp)) {
-							line(mColorFrame, Point2f((tempr.br() + tempr.tl()) / 2) , temp, color, 5, CV_AA, 0);
+				if (vrPrevVehicles.empty())
+				{
+					vrVehicles.push_back(Vehicle(r0));
+				}
+				if (Vehicle::counter >= 1000)
+					Vehicle::counter = 0;
+				if (!vrPrevVehicles.empty()) {
+					std::vector<Vehicle>::iterator itcR = vrPrevVehicles.begin();
+					bool flag = false;
+					while (itcR != vrPrevVehicles.end()) {
+						Vehicle tempr = *itcR;
+						if (tempr.getDim().contains(temp)) {
+							vrVehicles.push_back(Vehicle(r0, tempr.getID()));
+							line(mColorFrame, Point2f((tempr.getDim().br() + tempr.getDim().tl()) / 2) , temp, color, 5, CV_AA, 0);
+							putText(mColorFrame, std::to_string(tempr.getID()), tempr.getDim().tl(), FONT_HERSHEY_SIMPLEX, 1, color, 2, CV_AA, false);
+							flag = true;
 						}
 						itcR++;
+					}
+					if (!flag)
+					{
+						vrVehicles.push_back(Vehicle(r0));
 					}
 				}
 				circle(mColorFrame, temp , 5, Scalar(255, 0, 255), -1, 8, 0);
@@ -61,7 +74,7 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg)
 
 			++itc;
 	}
-	vrPrevRects.swap(vrRects);
+	vrPrevVehicles.swap(vrVehicles);
 	ret[1] = mColorFrame;
 	mMask.deallocate();
 	mColorFrame.deallocate();
