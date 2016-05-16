@@ -40,8 +40,8 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg)
 			cv::Scalar color(255, 255, 255);
 
 			cv::Rect r0 = cv::boundingRect(pointsMatrix);
-			if(r0.area()>4000)
-			cv::rectangle(mColorFrame, r0, color, 2);
+			if (r0.area() > 4000)
+				cv::rectangle(mColorFrame, r0, color, 2);
 
 			++itc;
 
