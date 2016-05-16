@@ -37,6 +37,11 @@ int mMinWindow::getHeigth()
 	return h;
 }
 
+vector<pair<cv::Point2f, cv::Point2f>> mMinWindow::getResultVector()
+{
+	return resultVector;
+}
+
 inline double  mMinWindow::square(int a)
 {
 	return a * a;
@@ -45,6 +50,7 @@ inline double  mMinWindow::square(int a)
 
 cv::Mat mMinWindow::drawVectors(Mat frame)
 {
+	resultVector.clear();
 	if (iRefreshCounter == 15) {
 		corners[1].clear();
 		corners[0].clear();
@@ -84,20 +90,11 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
 			circle(mColorFrame, corners[0][i], 5, Scalar(255, 0, 255), -1, 8, 0);
 
 			if (hypotenuse > 3 && hypotenuse < 15) {
-
 				q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
 				q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
-
-				line(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0);
-
-				p.x = (int)(q.x + 9 * cos(angle + pi / 4));
-				p.y = (int)(q.y + 9 * sin(angle + pi / 4));
-				line(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0);
-				p.x = (int)(q.x + 9 * cos(angle - pi / 4));
-				p.y = (int)(q.y + 9 * sin(angle - pi / 4));
-				line(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0);
+				arrowedLine(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0, 0.3);
+				resultVector.push_back(pair<Point2f, Point2f>(p, q));
 			}
-
 		}
 
 	corners[1].swap(corners[0]);

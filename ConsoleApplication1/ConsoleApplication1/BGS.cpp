@@ -26,7 +26,12 @@ BGS::~BGS()
 {
 }
 
-cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg)
+inline double  BGS::square(int a)
+{
+	return a * a;
+}
+
+cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Point2f>> vp_p2fArgument)
 {
 	vrVehicles.clear();
 	mColorFrameArg(rRect).copyTo(mColorFrame);
@@ -58,11 +63,25 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg)
 						if (tempr.getDim().contains(temp)) {
 							vrVehicles.push_back(Vehicle(r0, tempr.getID()));
 							line(mColorFrame, Point2f((tempr.getDim().br() + tempr.getDim().tl()) / 2) , temp, color, 5, CV_AA, 0);
-							putText(mColorFrame, std::to_string(tempr.getID()), tempr.getDim().tl(), FONT_HERSHEY_SIMPLEX, 1, color, 2, CV_AA, false);
+							putText(mColorFrame, std::to_string(tempr.getID()),r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+							std::vector<pair<cv::Point2f, cv::Point2f>>::iterator itcPP = vp_p2fArgument.begin();
+							while (itcPP != vp_p2fArgument.end()) {
+								pair<cv::Point2f, cv::Point2f> tempPP = *itcPP;
+								if (r0.contains(tempPP.first)) {
+									double hypotenuse = sqrt(square(tempPP.first.y - tempPP.second.y) + square(tempPP.first.x - tempPP.second.x));
+									if (hypotenuse > 3 && hypotenuse < 15) {
+										putText(mColorFrame, std::to_string(hypotenuse), (r0.tl() + Point(r0.width/2, 0)), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+										break;
+									}
+								}
+								itcPP++;
+							}
 							flag = true;
+							break;
 						}
 						itcR++;
 					}
+
 					if (!flag)
 					{
 						vrVehicles.push_back(Vehicle(r0));

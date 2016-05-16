@@ -161,7 +161,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BGS.h" />
-    <ClInclude Include="BGSProduct.h" />
     <ClInclude Include="mMinWindow.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -169,7 +168,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BGS.cpp" />
-    <ClCompile Include="BGSProduct.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mMinWindow.cpp" />
     <ClCompile Include="stdafx.cpp">

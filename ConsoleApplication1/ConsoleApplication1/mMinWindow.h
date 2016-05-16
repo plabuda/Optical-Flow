@@ -19,7 +19,7 @@ private:
 	vector<uchar> status;
 	vector<float> err;
 	vector<cv::Point2f> corners[2];
-
+	vector<pair<cv::Point2f, cv::Point2f>> resultVector;
 	Size winSize, subPixWinSize;
 	TermCriteria termcrit;
 
@@ -30,6 +30,7 @@ public:
 
 	int getWidth();
 	int getHeigth();
+	vector<pair<cv::Point2f, cv::Point2f>> getResultVector();
 
 private:
 	inline double square(int);

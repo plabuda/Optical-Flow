@@ -1,5 +1,4 @@
 #pragma once
-#include "BGSProduct.h"
 #include "Vehicle.h"
 #include <vector>
 
@@ -26,9 +25,11 @@ public:
 	BGS::BGS(int xv, int yv, int wv, int hv, int history, float varThreshold, bool bShadowDetection);
 	~BGS();
 
+	double square(int a);
+
 private:
 
 public:
-	cv::Mat* drawSquare(cv::Mat mColorFrameArg);
+	cv::Mat* drawSquare(cv::Mat mColorFrameArg, std::vector<std::pair<cv::Point2f, cv::Point2f>>);
 };
 

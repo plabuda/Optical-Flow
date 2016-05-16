@@ -4,7 +4,6 @@
 #include <math.h>
 #include "mMinWindow.h"
 #include "BGS.h"
-#include "BGSProduct.h"
 
 // haar cascade !!!!!!!!!!!!!
 
@@ -81,7 +80,7 @@ int main(void)
 					mMinFrame1.getWidth(),
 					mMinFrame1.getHeigth())));
 		}
-		result1 = bgsFrame0.drawSquare(frame);
+		result1 = bgsFrame0.drawSquare(frame, mMinFrame0.getResultVector());
 		mFrame2 = result1[0];
 		if (!mFrame2.empty()) {
 		mFrame2.copyTo(mFrame_Wrapper_Mask(
@@ -92,7 +91,7 @@ int main(void)
 				mFrame2.rows)));
 		}
 
-		result2 = bgsFrame1.drawSquare(frame);
+		result2 = bgsFrame1.drawSquare(frame, mMinFrame0.getResultVector());
 		mFrame3 = result2[0];
 		if (!mFrame3.empty()) {
 			mFrame3.copyTo(mFrame_Wrapper_Mask(
