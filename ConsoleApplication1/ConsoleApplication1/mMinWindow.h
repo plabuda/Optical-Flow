@@ -6,11 +6,6 @@ using namespace std;
 class mMinWindow
 {
 private:
-	int x;
-	int y;
-	int w;
-	int h;
-
 	int iRefreshCounter = 0;
 	RNG rng;
 	Rect rRect;
@@ -25,7 +20,7 @@ private:
 
 public:
 	mMinWindow();
-	mMinWindow(int, int, int, int, Size, Size, TermCriteria);
+	mMinWindow(Rect, Size, Size, TermCriteria);
 	~mMinWindow();
 
 	int getWidth();

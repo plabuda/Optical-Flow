@@ -8,13 +8,8 @@ mMinWindow::mMinWindow()
 {
 }
 
-mMinWindow::mMinWindow(int xv, int yv, int wv, int hv, Size winSizev, Size subPixWinSizev, TermCriteria termcritv) {
-	x = xv;
-	y = yv;
-	w = wv;
-	h = hv;
-	rRect = Rect(xv, yv, wv, hv);
-
+mMinWindow::mMinWindow(Rect rSizeArg, Size winSizev, Size subPixWinSizev, TermCriteria termcritv) {
+	rRect = Rect(rSizeArg);
 	winSize = winSizev;
 	subPixWinSize = subPixWinSizev;
 	termcrit = termcritv;
@@ -29,12 +24,12 @@ mMinWindow::~mMinWindow()
 
 int mMinWindow::getWidth()
 {
-	return w;
+	return rRect.width;
 }
 
 int mMinWindow::getHeigth()
 {
-	return h;
+	return rRect.height;
 }
 
 vector<pair<cv::Point2f, cv::Point2f>> mMinWindow::getResultVector()
