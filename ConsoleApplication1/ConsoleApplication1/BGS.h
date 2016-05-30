@@ -1,7 +1,6 @@
 #pragma once
 #include "Vehicle.h"
 #include <vector>
-#include <opencv2/bgsegm.hpp>
 
 class BGS
 {
