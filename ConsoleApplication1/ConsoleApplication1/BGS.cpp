@@ -41,38 +41,13 @@ inline double  BGS::square(int a)
 	return a * a;
 }
 
-void BGS::Refactor(Mat &mArg, Mat mWrapper, Rect rRect)
+void BGS::Refactor(Mat &mArg)
 {
-	mArg.copyTo(mWrapper(
-		cv::Rect(
-			0,
-			0,
-			rRect.width,
-			rRect.height)));
-	mArg = mArg * 255;
-
 	morphologyEx(mArg, mArg, MORPH_CLOSE, se1);
-
-	mArg.copyTo(mWrapper(
-		cv::Rect(
-			rRect.width + 50,
-			0,
-			rRect.width,
-			rRect.height)));
-
 	morphologyEx(mArg, mArg, MORPH_OPEN, se2);
 	erode(mArg, mArg, mMaskG);
 	dilate(mArg, mArg, mMaskG);
-
 	erode(mArg, mArg, mMaskG);
-	mArg.copyTo(mWrapper(
-		cv::Rect(
-			rRect.width * 2 + 100,
-			0,
-			rRect.width,
-			rRect.height)));
-	mArg = mArg / 255;
-	imshow("test", mWrapper);
 }
 
 cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Point2f>> vp_p2fArgument)
@@ -86,7 +61,7 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 	mColorFrameArg(rRect).copyTo(mColorFrame);
 	mColorFrameArg(rRect).copyTo(mColorFrame1);
 	pMOG2->apply(mColorFrame, mMask, 0.001);
-	Refactor(Mat(mMask), mFrame_Wrapper, rRect);
+	Refactor(mMask);
 	//test1(Mat(mMask), mFrame_Wrapper, rRect);
 	ret[0] = mMask;
 

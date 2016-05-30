@@ -123,8 +123,6 @@ int main(void)
 	
 		
 		imshow("Optical Flow", mFrame2);
-		imshow("Mask", mFrame_Wrapper_Mask);
-		//imshow("Counturs", mFrame_Wrapper_Counturs);
 		int key_pressed = waitKey(1);
 		if (key_pressed == 'q') break;
 			

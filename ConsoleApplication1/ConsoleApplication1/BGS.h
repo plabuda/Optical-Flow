@@ -29,8 +29,7 @@ public:
 	
 
 private:
-	void Refactor(cv::Mat &mArg, cv::Mat mWrapper, cv::Rect rRect);
-	void test1(cv::Mat mArg, cv::Mat mWrapper, cv::Rect rRect);
+	void Refactor(cv::Mat &mArg);
 public:
 	cv::Mat* drawSquare(cv::Mat mColorFrameArg, std::vector<std::pair<cv::Point2f, cv::Point2f>>);
 };
