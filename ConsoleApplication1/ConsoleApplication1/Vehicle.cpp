@@ -9,10 +9,18 @@ Vehicle::Vehicle(cv::Rect dimensions)
 	counter++;
 }
 
+
 Vehicle::Vehicle(cv::Rect dimensions, int id)
 {
 	this->dimensions = dimensions;
 	this->id = id;
+}
+
+
+Vehicle::Vehicle(cv::Rect dimensions, Vehicle prevVehicle)
+{
+	this->dimensions = dimensions;
+	this->id = prevVehicle.getID();
 }
 
 
@@ -30,6 +38,12 @@ cv::Rect Vehicle::getDim()
 int Vehicle::getID()
 {
 	return id;
+}
+
+
+void Vehicle::addDim()
+{
+	vrDimensions.push_back(dimensions);
 }
 
 

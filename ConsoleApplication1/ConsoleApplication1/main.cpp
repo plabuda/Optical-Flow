@@ -18,6 +18,7 @@ int main(void)
 	Mat* result1;
 	Mat* result2;
 	VideoCapture cap;
+	vector<pair<cv::Point2f, cv::Point2f>> V2P;
 
 	cap.open("highway.avi");
 
@@ -28,10 +29,11 @@ int main(void)
 
 	namedWindow("Optical Flow", CV_WINDOW_AUTOSIZE);
 	
-	mMinWindow mMinFrame0 = mMinWindow(710, 550, 150, 300, winSize, subPixWinSize, termcrit);
-	mMinWindow mMinFrame1 = mMinWindow(1150, 500, 150, 300, winSize, subPixWinSize, termcrit);
-	BGS bgsFrame0 = BGS(710, 550, 150, 300, 30, 20, false);
-	BGS bgsFrame1 = BGS(1150, 500, 150, 300, 30, 20, false);
+
+	mMinWindow mMinFrame0 = mMinWindow(710, 550, 150, 300, winSize, subPixWinSize, termcrit, &V2P);
+	mMinWindow mMinFrame1 = mMinWindow(1150, 500, 150, 300, winSize, subPixWinSize, termcrit, &V2P);
+	BGS bgsFrame0 = BGS(710, 550, 150, 300, 30, 20, false, &V2P);
+	BGS bgsFrame1 = BGS(1150, 500, 150, 300, 30, 20, false, &V2P);
 	cv::Mat mFrame_Wrapper(
 		cv::Size(mMinFrame0.getWidth() * 2 + 50,
 				 mMinFrame0.getHeigth()), 

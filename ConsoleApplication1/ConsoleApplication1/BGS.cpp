@@ -6,12 +6,16 @@
 using namespace cv;
 using namespace std;
 
+const int mpoint = 250;
+const double tmpwidth = 10000;
+
 BGS::BGS()
 {
 }
 
 
-BGS::BGS(int xv, int yv, int wv, int hv, int history, float varThreshold, bool bShadowDetection){
+BGS::BGS(int xv, int yv, int wv, int hv, int history, float varThreshold, bool bShadowDetection, vector<pair<cv::Point2f, cv::Point2f>> *argV2P)
+{
 	x = xv;
 	y = yv;
 	w = wv;
@@ -19,6 +23,7 @@ BGS::BGS(int xv, int yv, int wv, int hv, int history, float varThreshold, bool b
 	rRect = Rect(xv, yv, wv, hv);
 	pMOG2 = createBackgroundSubtractorMOG2(history, varThreshold, bShadowDetection);
 	pMOG2->setNMixtures(1);
+	V2P = argV2P;
 }
 
 
@@ -61,7 +66,7 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 					while (itcR != vrPrevVehicles.end()) {
 						Vehicle tempr = *itcR;
 						if (tempr.getDim().contains(temp)) {
-							vrVehicles.push_back(Vehicle(r0, tempr.getID()));
+							vrVehicles.push_back(Vehicle(r0, tempr));
 							line(mColorFrame, Point2f((tempr.getDim().br() + tempr.getDim().tl()) / 2) , temp, color, 5, CV_AA, 0);
 							putText(mColorFrame, std::to_string(tempr.getID()),r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
 							std::vector<pair<cv::Point2f, cv::Point2f>>::iterator itcPP = vp_p2fArgument.begin();
@@ -76,6 +81,8 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 								}
 								itcPP++;
 							}
+							//cv::Point tmpTest = mMW.getVec(r0);
+							cv::Point tmpTest = getVec(r0);
 							flag = true;
 							break;
 						}
@@ -98,4 +105,32 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 	mMask.deallocate();
 	mColorFrame.deallocate();
 	return ret;
+}
+
+
+cv::Point BGS::getVec(cv::Rect bgsRect)
+{
+	cv::Point carVector;
+	int n = 0;
+	carVector.x = 0;
+	carVector.y = 0;
+	cv::Point tmpQ;
+
+	for (int i = 0; i < V2P->size(); i++)
+	{
+		if (bgsRect.contains(V2P->at(i).first))
+		{
+			tmpQ.x += V2P->at(i).second.x;
+			tmpQ.y += V2P->at(i).second.y;
+			n++;
+		}
+	}
+	if (n == 0)
+		return carVector;
+	tmpQ.x /= n;
+	tmpQ.y /= n;
+
+	carVector.x = tmpQ.x;
+	carVector.y = tmpQ.y;
+	return carVector;
 }

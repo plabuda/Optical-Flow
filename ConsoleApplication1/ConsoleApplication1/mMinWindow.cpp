@@ -8,7 +8,7 @@ mMinWindow::mMinWindow()
 {
 }
 
-mMinWindow::mMinWindow(int xv, int yv, int wv, int hv, Size winSizev, Size subPixWinSizev, TermCriteria termcritv) {
+mMinWindow::mMinWindow(int xv, int yv, int wv, int hv, Size winSizev, Size subPixWinSizev, TermCriteria termcritv, vector<pair<cv::Point2f, cv::Point2f>> *argV2P) {
 	x = xv;
 	y = yv;
 	w = wv;
@@ -18,6 +18,7 @@ mMinWindow::mMinWindow(int xv, int yv, int wv, int hv, Size winSizev, Size subPi
 	winSize = winSizev;
 	subPixWinSize = subPixWinSizev;
 	termcrit = termcritv;
+	V2P = argV2P;
 
 	rng = RNG(123);
 }
@@ -92,6 +93,8 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
 			if (hypotenuse > 3 && hypotenuse < 15) {
 				q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
 				q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
+				pair<cv::Point2f, cv::Point2f> tmpPair(p, q);
+				tmpV2P->push_back(tmpPair);
 				arrowedLine(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0, 0.3);
 				resultVector.push_back(pair<Point2f, Point2f>(p, q));
 			}
@@ -100,5 +103,9 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
 	corners[1].swap(corners[0]);
 	swap(mPrevGrayFrame, mGrayFrame);
 	mGrayFrame.deallocate();
+	//prevCarVectors.clear();
+	if (tmpV2P->size() > 0)
+		tmpV2P->swap(*V2P);
+	tmpV2P->clear();
 	return mColorFrame;
 }

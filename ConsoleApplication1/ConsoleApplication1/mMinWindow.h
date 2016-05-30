@@ -11,6 +11,8 @@ private:
 	int w;
 	int h;
 
+	struct sVector;
+
 	int iRefreshCounter = 0;
 	RNG rng;
 	Rect rRect;
@@ -22,10 +24,11 @@ private:
 	vector<pair<cv::Point2f, cv::Point2f>> resultVector;
 	Size winSize, subPixWinSize;
 	TermCriteria termcrit;
+	vector<pair<cv::Point2f, cv::Point2f>> *V2P, *tmpV2P = new vector<pair<cv::Point2f, cv::Point2f>>;
 
 public:
 	mMinWindow();
-	mMinWindow(int, int, int, int, Size, Size, TermCriteria);
+	mMinWindow(int, int, int, int, Size, Size, TermCriteria, vector<pair<cv::Point2f, cv::Point2f>> *V2P);
 	~mMinWindow();
 
 	int getWidth();
