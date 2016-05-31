@@ -6,6 +6,7 @@
 #include <iterator>
 #include <string>
 #include <vector>
+#include <algorithm>>
 using namespace cv;
 using namespace std;
 
@@ -75,7 +76,7 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 
 		cv::Rect r0 = cv::boundingRect(pointsMatrix);
 					
-		if (r0.area() > 4000) {
+		if (r0.area() > 4000 && r0.width < r0.height * 1.5) {
 			Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
 			if (vrPrevVehicles.empty())
 			{
@@ -88,11 +89,10 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 				bool flag = false;
 				while (itcR != vrPrevVehicles.end()) {
 					Vehicle tempr = *itcR;
-
 					if (tempr.getDim().contains(temp)) {
 						Point2f p2fCenter = (tempr.getDim().br() + tempr.getDim().tl()) / 2;
-					
 
+						
 						vrVehicles.push_back(Vehicle(r0, tempr.getID()));
 						line(mColorFrame, p2fCenter, temp, color, 5, CV_AA, 0);
 						putText(mColorFrame, std::to_string(tempr.getID()),r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
@@ -114,9 +114,38 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 					itcR++;
 			}
 
-			if (!flag)			
-				vrVehicles.push_back(Vehicle(r0));
+			
+
+				if (!flag)			
+					vrVehicles.push_back(Vehicle(r0));
 			}
+
+			int *largestRect = new int[vrVehicles.size()];
+			vector<Vehicle> tmpVehicle;
+
+			/*std::sort(vrVehicles.begin(), vrVehicles.end(), cmp());
+			tmpVehicle.push_back(vrVehicles[0]);
+			for (int i = 1; i < vrVehicles.size() - 1; i++)
+			{
+				if (vrVehicles[i].getID() != vrVehicles[i + 1].getID())
+					tmpVehicle.push_back(vrVehicles[i + 1]);
+			}
+			if (vrVehicles.size() > 1)
+			{
+				if (vrVehicles[vrVehicles.size() - 2].getID() != vrVehicles[vrVehicles.size() - 1].getID())
+				{
+					tmpVehicle.push_back(vrVehicles[vrVehicles.size() - 1]);
+				}
+				vrVehicles = tmpVehicle;
+			}*/
+
+			/*for (int i = 0; i < vrVehicles.size(); i++)
+			{
+				if (vrVehicles[i].getDim().width * 2 < vrVehicles[i].getDim().height)
+					tmpVehicle.push_back(vrVehicles[i]);
+			}
+			vrVehicles = tmpVehicle;*/
+
 			cv::circle(mColorFrame, temp , 5, cv::Scalar(255, 0, 255), -1, 8, 0);
 
 			if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) {
@@ -139,3 +168,12 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 	mColorFrame.deallocate();
 	return ret;
 }
+
+//struct BGS::cmp {
+//	inline bool operator()(Vehicle &v1, Vehicle &v2)
+//	{
+//		if (v1.getID() == v2.getID())
+//			return v1.getDim().size().area() > v2.getDim().size().area();
+//		return v1.getID() < v2.getID();
+//	}
+//};

@@ -5,6 +5,15 @@
 class BGS
 {
 private:
+	struct cmp {
+		inline bool operator()(Vehicle &v1, Vehicle &v2)
+		{
+			if (v1.getID() == v2.getID())
+				return v1.getDim().size().area() > v2.getDim().size().area();
+			return v1.getID() < v2.getID();
+		}
+	};
+
 	int frame;
 	std::pair<cv::Point, cv::Point> p_pLine;
 	cv::RNG rng;
@@ -16,6 +25,7 @@ private:
 	std::vector<std::vector<cv::Point>> vvpContours;
 	//std::vector<cv::Rect> vrRects, vrPrevRects;
 	std::vector<Vehicle> vrVehicles, vrPrevVehicles;
+
 	
 public:
 	BGS();
