@@ -64,6 +64,8 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 	mColorFrameArg(rRect).copyTo(mColorFrame1);
 	pMOG2->apply(mColorFrame, mMask, 0.001);
 	imshow("ad", mMask);
+	cv::inRange(mMask, 200, 255, mMask);
+	imshow("ad", mMask);
 	Refactor(mMask);
 	//test1(Mat(mMask), mFrame_Wrapper, rRect);
 	ret[0] = mMask;
