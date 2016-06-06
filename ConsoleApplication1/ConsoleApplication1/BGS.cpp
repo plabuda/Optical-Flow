@@ -20,7 +20,6 @@ BGS::BGS(Rect rRectArg, int history, float varThreshold, int iDetectLineX1, int 
 	rRect = Rect(rRectArg);
 	pMOG2 = createBackgroundSubtractorMOG2(history, varThreshold);
 	pMOG2->setDetectShadows(true);
-	pMOG2->
 	pMOG2->setNMixtures(5);
 	//pMOG2->setShadowThreshold(127);
 	//pMOG2->setVarMin(200);
@@ -97,10 +96,20 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 					if (tempr.getDim().contains(temp)) {
 						Point2f p2fCenter = (tempr.getDim().br() + tempr.getDim().tl()) / 2;
 
+						if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) {
+							cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);
+							tempr.measure();
+						}
+						else
+						{
+							cv::rectangle(mColorFrame, r0, color, 2);
+							putText(mColorFrame, std::to_string(tempr.getLength()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+						}
 						
-						vrVehicles.push_back(Vehicle(r0, tempr.getID()));
+						//vrVehicles.push_back(Vehicle(r0, tempr.getID()));
+						vrVehicles.push_back(Vehicle(r0, tempr));
 						line(mColorFrame, p2fCenter, temp, color, 5, CV_AA, 0);
-						putText(mColorFrame, std::to_string(tempr.getID()),r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+						//putText(mColorFrame, std::to_string(tempr.getID()),r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
 						std::vector<pair<cv::Point2f, cv::Point2f>>::iterator itcPP = vp_p2fArgument.begin();
 						while (itcPP != vp_p2fArgument.end()) {
 							pair<cv::Point2f, cv::Point2f> tempPP = *itcPP;
@@ -128,44 +137,13 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 			int *largestRect = new int[vrVehicles.size()];
 			vector<Vehicle> tmpVehicle;
 
-			/*std::sort(vrVehicles.begin(), vrVehicles.end(), cmp());
-			tmpVehicle.push_back(vrVehicles[0]);
-			for (int i = 1; i < vrVehicles.size() - 1; i++)
-			{
-				if (vrVehicles[i].getID() != vrVehicles[i + 1].getID())
-					tmpVehicle.push_back(vrVehicles[i + 1]);
-			}
-			if (vrVehicles.size() > 1)
-			{
-				if (vrVehicles[vrVehicles.size() - 2].getID() != vrVehicles[vrVehicles.size() - 1].getID())
-				{
-					tmpVehicle.push_back(vrVehicles[vrVehicles.size() - 1]);
-				}
-				vrVehicles = tmpVehicle;
-			}*/
-
-			/*for (int i = 0; i < vrVehicles.size(); i++)
-			{
-				if (vrVehicles[i].getDim().width * 2 < vrVehicles[i].getDim().height)
-					tmpVehicle.push_back(vrVehicles[i]);
-			}
-			vrVehicles = tmpVehicle;*/
-
+			
 			cv::circle(mColorFrame, temp , 5, cv::Scalar(255, 0, 255), -1, 8, 0);
 
-			if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) {
-				cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);
-			}	
-			else
-				cv::rectangle(mColorFrame, r0, color, 2);
 		}		
 	
 		++itc;
 	}
-	//std::ofstream f("frames/somefile" + to_string(frame) + ".txt");
-	//for (vector<Vehicle>::iterator i = vrVehicles.begin(); i != vrVehicles.end(); ++i) {
-//		f << i->getID() << " " << i->getDim().size() << '\n';
-//	}
 	frame++;
 	vrPrevVehicles.swap(vrVehicles);
 	ret[1] = mColorFrame;
@@ -174,11 +152,3 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 	return ret;
 }
 
-//struct BGS::cmp {
-//	inline bool operator()(Vehicle &v1, Vehicle &v2)
-//	{
-//		if (v1.getID() == v2.getID())
-//			return v1.getDim().size().area() > v2.getDim().size().area();
-//		return v1.getID() < v2.getID();
-//	}
-//};
