@@ -66,6 +66,12 @@ double Vehicle::getWidth()
 }
 
 
+bool Vehicle::getMeasured()
+{
+	return measured;
+}
+
+
 void Vehicle::setSpeed(int speed)
 {
 	if (this->speed < speed)

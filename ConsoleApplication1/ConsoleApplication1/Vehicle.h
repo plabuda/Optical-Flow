@@ -23,5 +23,6 @@ public:
 	void countLength();
 	double getLength();
 	double getWidth();
+	bool getMeasured();
 };
 

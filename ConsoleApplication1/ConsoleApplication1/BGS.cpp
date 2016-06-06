@@ -55,7 +55,7 @@ void BGS::Refactor(Mat &mArg)
 cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Point2f>> vp_p2fArgument)
 {
 	vector<int> ind;
-	Mat tempmat;
+	Mat tempmat, tempmat1;
 	cv::Mat mFrame_Wrapper(
 		cv::Size(rRect.width * 3 + 100,
 			rRect.height),
@@ -64,7 +64,7 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 	mColorFrameArg(rRect).copyTo(mColorFrame);
 	mColorFrameArg(rRect).copyTo(mColorFrame1);
 	pMOG2->apply(mColorFrame, mMask, 0.001);
-	imshow("ad", mMask);
+	//imshow("ad", mMask);
 	cv::inRange(mMask, 200, 255, mMask);
 	imshow("ad", mMask);
 	Refactor(mMask);
@@ -97,9 +97,18 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 					if (tempr.getDim().contains(temp)) {
 						Point2f p2fCenter = (tempr.getDim().br() + tempr.getDim().tl()) / 2;
 
+						
+
 						if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) {
 							cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);
 							tempr.measure();
+								if ((std::find(ind.begin(), ind.end(), tempr.getID()) == ind.end())) {
+									
+									ind.push_back(tempr.getID());
+									mColorFrame1(r0).copyTo(tempmat);
+									imshow("sda", tempmat);
+								}
+							
 						}
 						else
 						{
@@ -107,7 +116,7 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 							if (tempr.getLength() != 0)
 							{
 								putText(mColorFrame, std::to_string(tempr.getWidth()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255), 1, CV_AA, false);
-							
+								putText(mColorFrame, std::to_string(tempr.getLength()), (r0.tl() + Point(r0.width / 2, 0)), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 0), 1, CV_AA, false);
 								tempr.countLength();
 							}
 						}
@@ -117,7 +126,7 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 							if (r0.contains(tempPP.first)) {
 								double hypotenuse = sqrt(square(tempPP.first.y - tempPP.second.y) + square(tempPP.first.x - tempPP.second.x));
 								if (hypotenuse > 3 && hypotenuse < 15) {
-									putText(mColorFrame, std::to_string(hypotenuse), (r0.tl() + Point(r0.width / 2, 0)), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+									//putText(mColorFrame, std::to_string(hypotenuse), (r0.tl() + Point(r0.width / 2, 0)), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
 									tempr.setSpeed(hypotenuse);
 									break;
 								}
@@ -125,24 +134,24 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 							itcPP++;
 						}
 
-						if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) {
-							if ((std::find(ind.begin(), ind.end(), tempr.getID()) == ind.end())) {
-								vector<int> compression_params;
-								compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
-								compression_params.push_back(9);
-								ind.push_back(tempr.getID());
-								mColorFrame1(r0).copyTo(tempmat);
-								putText(tempmat, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows) , FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
-								putText(tempmat, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols/2, tempmat.rows), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
-								imshow("sda", tempmat);
-								imwrite("images/img" + std::to_string(tempr.getID()) + ".png", tempmat, compression_params);
-							}
-						}
+						
 						//vrVehicles.push_back(Vehicle(r0, tempr.getID()));
 						vrVehicles.push_back(Vehicle(r0, tempr));
 						line(mColorFrame, p2fCenter, temp, color, 5, CV_AA, 0);
 						//putText(mColorFrame, std::to_string(tempr.getID()),r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
 						
+
+						if (tempr.getMeasured() && !tempmat.empty())
+						{
+							vector<int> compression_params;
+							tempmat.copyTo(tempmat1);
+							compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
+							compression_params.push_back(9);
+							putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+							putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+							imwrite("images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
+						}
+
 					flag = true;
 					break;
 				}
