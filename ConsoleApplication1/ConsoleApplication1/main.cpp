@@ -77,49 +77,12 @@ int main(void)
 					mMinFrame1.getHeigth())));
 		*/
 		result1 = bgsFrame0.drawSquare(frame, mMinFrame0.getResultVector());
-		mFrame2 = result1[0];
-		/*if (!mFrame2.empty()) 
-		mFrame2.copyTo(mFrame_Wrapper_Mask(
-			cv::Rect(
-				0,
-				0,
-				mFrame2.cols,
-				mFrame2.rows)));
-		*/
-		/*
-		result2 = bgsFrame1.drawSquare(frame, mMinFrame0.getResultVector());
-		mFrame3 = result2[0];
-		if (!mFrame3.empty()) 
-			mFrame3.copyTo(mFrame_Wrapper_Mask(
-				cv::Rect(
-					mMinFrame0.getWidth() + 50,
-					0,
-					mFrame3.cols,
-					mFrame3.rows)));
-		*/
-
+		mFrame2 = result1[0];		
 		mFrame2 = result1[1];
-		/*if (!mFrame2.empty()) 
-			mFrame2.copyTo(mFrame_Wrapper_Counturs(
-				cv::Rect(
-					0,
-					0,
-					mFrame2.cols,
-					mFrame2.rows)));
-		
 
-		mFrame3 = result2[1];
-		if (!mFrame3.empty()) 
-			mFrame3.copyTo(mFrame_Wrapper_Counturs(
-				cv::Rect(
-					mMinFrame0.getWidth() + 50,
-					0,
-					mFrame3.cols,
-					mFrame3.rows)));
-		*/
-	
 		
 		imshow("Optical Flow", mFrame2);
+		imshow("Optical Flow1", mFrame0);
 		int key_pressed = waitKey(1);
 		if (key_pressed == 'q') break;
 			

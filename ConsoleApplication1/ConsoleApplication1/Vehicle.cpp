@@ -59,13 +59,13 @@ double Vehicle::getLength()
 
 void Vehicle::setSpeed(int speed)
 {
-	if (this->speed == 0)
+	if (this->speed < speed)
 	{
 		this->speed = speed;
 		return;
 	}
-	this->speed += speed;
-	this->speed /= 2;
+	/*this->speed += speed;
+	this->speed /= 2;*/
 }
 
 
@@ -73,8 +73,19 @@ void Vehicle::countLength()
 {
 	if (speed == 0 || measured)
 		return;
-	double x = 0.1575445;
-	length = length * x * speed;
+	
+	length = length * speed;
+
+	double x = 0.020625;
+	/*if (length > 280)
+		x = 0.0154;
+	*/
+	if (length < 400)
+	{
+		length = length + 180;
+		length /= 2;
+	}
+	length *= x;
 	measured = true;
 }
 
