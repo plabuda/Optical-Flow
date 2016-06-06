@@ -4,7 +4,7 @@ class Vehicle
 private:
 	int id;
 	cv::Rect dimensions;
-	int length;
+	double length;
 	int speed;
 	bool measured;
 
@@ -20,6 +20,6 @@ public:
 	int getID();
 	void measure();
 	void countLength();
-	int getLength();
+	double getLength();
 };
 

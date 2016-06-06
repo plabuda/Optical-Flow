@@ -85,10 +85,10 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
 			circle(mColorFrame, corners[0][i], 5, Scalar(255, 0, 255), -1, 8, 0);
 
 			if (hypotenuse > 3 && hypotenuse < 15) {
+				resultVector.push_back(pair<Point2f, Point2f>(p, q));
 				q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
 				q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
 				arrowedLine(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0, 0.3);
-				resultVector.push_back(pair<Point2f, Point2f>(p, q));
 			}
 		}
 

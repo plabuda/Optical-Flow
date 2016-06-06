@@ -52,7 +52,7 @@ void Vehicle::measure()
 }
 
 
-int Vehicle::getLength()
+double Vehicle::getLength()
 {
 	return length;
 }
@@ -73,7 +73,7 @@ void Vehicle::countLength()
 {
 	if (speed == 0 || measured)
 		return;
-	double x = 1;
+	double x = 0.1575445;
 	length = length * x * speed;
 	measured = true;
 }

@@ -106,7 +106,7 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 							cv::rectangle(mColorFrame, r0, color, 2);
 							if (tempr.getLength() != 0)
 							{
-								putText(mColorFrame, std::to_string(tempr.getLength()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+								putText(mColorFrame, std::to_string(tempr.getLength()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255), 1, CV_AA, false);
 							
 								tempr.countLength();
 							}
