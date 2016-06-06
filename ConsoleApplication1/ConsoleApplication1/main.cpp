@@ -27,7 +27,7 @@ int main(void)
 	
 	cap >> frame;
 
-	win1 = cv::Rect(0, 0, frame.cols, frame.rows);
+	win1 = cv::Rect(400, 200, 300, frame.rows - 200);
 	//win2 = cv::Rect(1150, 500, 150, 300);
 	mMinWindow mMinFrame0 = mMinWindow(win1, winSize, subPixWinSize, termcrit);
 	//mMinWindow mMinFrame1 = mMinWindow(win2, winSize, subPixWinSize, termcrit);
@@ -43,10 +43,7 @@ int main(void)
 	mMinFrame0.getHeigth()),
 	CV_8UC3);
 	*/
-	cv::Mat mFrame_Wrapper_Mask(
-		cv::Size(mMinFrame0.getWidth() * 2 + 50,
-			mMinFrame0.getHeigth()),
-		CV_8UC1);
+	//cv::Mat mFrame_Wrapper_Mask(cv::Size(mMinFrame0.getWidth() * 2 + 50,mMinFrame0.getHeigth()),CV_8UC1);
 
 	while (true)
 	{
@@ -81,14 +78,14 @@ int main(void)
 		*/
 		result1 = bgsFrame0.drawSquare(frame, mMinFrame0.getResultVector());
 		mFrame2 = result1[0];
-		if (!mFrame2.empty()) 
+		/*if (!mFrame2.empty()) 
 		mFrame2.copyTo(mFrame_Wrapper_Mask(
 			cv::Rect(
 				0,
 				0,
 				mFrame2.cols,
 				mFrame2.rows)));
-		
+		*/
 		/*
 		result2 = bgsFrame1.drawSquare(frame, mMinFrame0.getResultVector());
 		mFrame3 = result2[0];

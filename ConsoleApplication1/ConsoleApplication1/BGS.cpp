@@ -19,10 +19,10 @@ BGS::BGS(Rect rRectArg, int history, float varThreshold, int iDetectLineX1, int 
 	frame = 0;
 	rRect = Rect(rRectArg);
 	pMOG2 = createBackgroundSubtractorMOG2(history, varThreshold);
-	pMOG2->setDetectShadows(false);
-	pMOG2->setNMixtures(1);
-	pMOG2->setShadowThreshold(127);
-	pMOG2->setVarMin(200);
+	pMOG2->setDetectShadows(true);
+	pMOG2->setNMixtures(5);
+	//pMOG2->setShadowThreshold(127);
+	//pMOG2->setVarMin(200);
 	pMOG2->setVarThresholdGen(10.1);
 	se1 = getStructuringElement(MORPH_RECT, Point(5, 5));
 	se2 = getStructuringElement(MORPH_RECT, Point(2, 2));
@@ -49,6 +49,7 @@ void BGS::Refactor(Mat &mArg)
 	erode(mArg, mArg, mMaskG);
 	dilate(mArg, mArg, mMaskG);
 	erode(mArg, mArg, mMaskG);
+	imshow("adsa", mArg);
 }
 
 cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Point2f>> vp_p2fArgument)
@@ -62,6 +63,7 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 	mColorFrameArg(rRect).copyTo(mColorFrame);
 	mColorFrameArg(rRect).copyTo(mColorFrame1);
 	pMOG2->apply(mColorFrame, mMask, 0.001);
+	imshow("ad", mMask);
 	Refactor(mMask);
 	//test1(Mat(mMask), mFrame_Wrapper, rRect);
 	ret[0] = mMask;
