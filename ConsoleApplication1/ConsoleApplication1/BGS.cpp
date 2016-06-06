@@ -20,6 +20,7 @@ BGS::BGS(Rect rRectArg, int history, float varThreshold, int iDetectLineX1, int 
 	rRect = Rect(rRectArg);
 	pMOG2 = createBackgroundSubtractorMOG2(history, varThreshold);
 	pMOG2->setDetectShadows(true);
+	pMOG2->
 	pMOG2->setNMixtures(5);
 	//pMOG2->setShadowThreshold(127);
 	//pMOG2->setVarMin(200);
