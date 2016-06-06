@@ -31,7 +31,7 @@ int main(void)
 	//win2 = cv::Rect(1150, 500, 150, 300);
 	mMinWindow mMinFrame0 = mMinWindow(win1, winSize, subPixWinSize, termcrit);
 	//mMinWindow mMinFrame1 = mMinWindow(win2, winSize, subPixWinSize, termcrit);
-	BGS bgsFrame0 = BGS(win1, 30, 20, 0, 149, 160);
+	BGS bgsFrame0 = BGS(win1, 30, 20, 0, win1.width, 300);
 	//BGS bgsFrame1 = BGS(win2, 30, 20, 0, 149, 120);
 	/*cv::Mat mFrame_Wrapper(
 	cv::Size(mMinFrame0.getWidth() * 2 + 50,
