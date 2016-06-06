@@ -8,6 +8,7 @@ Vehicle::Vehicle(cv::Rect dimensions)
 	this->dimensions = dimensions;
 	counter++;
 	length = 0;
+	width = 0;
 	speed = 0;
 	measured = false;
 }
@@ -26,6 +27,7 @@ Vehicle::Vehicle(cv::Rect dimensions, Vehicle &v1)
 	this->length = v1.length;
 	this->speed = v1.speed;
 	this->measured = v1.measured;
+	this->width = v1.width;
 }
 
 
@@ -57,6 +59,13 @@ double Vehicle::getLength()
 	return length;
 }
 
+
+double Vehicle::getWidth()
+{
+	return width;
+}
+
+
 void Vehicle::setSpeed(int speed)
 {
 	if (this->speed < speed)
@@ -86,6 +95,7 @@ void Vehicle::countLength()
 		length /= 2;
 	}
 	length *= x;
+	width = dimensions.width * 0.016087;
 	measured = true;
 }
 

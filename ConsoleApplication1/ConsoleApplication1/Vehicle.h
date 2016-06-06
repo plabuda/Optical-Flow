@@ -5,6 +5,7 @@ private:
 	int id;
 	cv::Rect dimensions;
 	double length;
+	double width;
 	int speed;
 	bool measured;
 
@@ -21,5 +22,6 @@ public:
 	void measure();
 	void countLength();
 	double getLength();
+	double getWidth();
 };
 
