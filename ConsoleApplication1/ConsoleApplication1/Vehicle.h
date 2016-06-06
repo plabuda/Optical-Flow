@@ -5,6 +5,8 @@ private:
 	int id;
 	cv::Rect dimensions;
 	int length;
+	int speed;
+	bool measured;
 
 public:
 	static int counter;
@@ -14,8 +16,10 @@ public:
 	~Vehicle();
 
 	cv::Rect getDim();
+	void setSpeed(int speed);
 	int getID();
 	void measure();
+	void countLength();
 	int getLength();
 };
 

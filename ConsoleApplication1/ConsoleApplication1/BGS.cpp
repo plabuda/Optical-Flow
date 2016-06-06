@@ -99,29 +99,36 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 						if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) {
 							cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);
 							tempr.measure();
+
 						}
 						else
 						{
 							cv::rectangle(mColorFrame, r0, color, 2);
-							putText(mColorFrame, std::to_string(tempr.getLength()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+							if (tempr.getLength() != 0)
+							{
+								putText(mColorFrame, std::to_string(tempr.getLength()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+							
+								tempr.countLength();
+							}
 						}
-						
-						//vrVehicles.push_back(Vehicle(r0, tempr.getID()));
-						vrVehicles.push_back(Vehicle(r0, tempr));
-						line(mColorFrame, p2fCenter, temp, color, 5, CV_AA, 0);
-						//putText(mColorFrame, std::to_string(tempr.getID()),r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
 						std::vector<pair<cv::Point2f, cv::Point2f>>::iterator itcPP = vp_p2fArgument.begin();
 						while (itcPP != vp_p2fArgument.end()) {
 							pair<cv::Point2f, cv::Point2f> tempPP = *itcPP;
 							if (r0.contains(tempPP.first)) {
 								double hypotenuse = sqrt(square(tempPP.first.y - tempPP.second.y) + square(tempPP.first.x - tempPP.second.x));
-							if (hypotenuse > 3 && hypotenuse < 15) {
-								putText(mColorFrame, std::to_string(hypotenuse), (r0.tl() + Point(r0.width/2, 0)), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
-								break;
+								if (hypotenuse > 3 && hypotenuse < 15) {
+									putText(mColorFrame, std::to_string(hypotenuse), (r0.tl() + Point(r0.width / 2, 0)), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+									tempr.setSpeed(hypotenuse);
+									break;
+								}
 							}
+							itcPP++;
 						}
-						itcPP++;
-					}
+						//vrVehicles.push_back(Vehicle(r0, tempr.getID()));
+						vrVehicles.push_back(Vehicle(r0, tempr));
+						line(mColorFrame, p2fCenter, temp, color, 5, CV_AA, 0);
+						//putText(mColorFrame, std::to_string(tempr.getID()),r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+						
 					flag = true;
 					break;
 				}
