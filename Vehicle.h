@@ -1,4 +1,6 @@
 #pragma once
+#include "opencv2/opencv.hpp"
+
 class Vehicle
 {
 private:
@@ -16,13 +18,13 @@ public:
 	Vehicle(cv::Rect dimensions, Vehicle&);
 	~Vehicle();
 
-	cv::Rect getDim();
+    cv::Rect getDim() const;
 	void setSpeed(int speed);
-	int getID();
+    int getID() const;
 	void measure();
-	void countLength();
-	double getLength();
-	double getWidth();
-	bool getMeasured();
+    void countLength();
+    double getLength() const;
+    double getWidth() const;
+    bool getMeasured() const;
 };
 

@@ -12,6 +12,7 @@ set(SOURCES
     BGS.cpp
     mMinWindow.cpp
     Vehicle.cpp
+    stdafx.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

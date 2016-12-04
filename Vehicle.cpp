@@ -36,13 +36,13 @@ Vehicle::~Vehicle()
 }
 
 
-cv::Rect Vehicle::getDim()
+cv::Rect Vehicle::getDim() const
 {
 	return dimensions;
 }
 
 
-int Vehicle::getID()
+int Vehicle::getID() const
 {
 	return id;
 }
@@ -54,19 +54,19 @@ void Vehicle::measure()
 }
 
 
-double Vehicle::getLength()
+double Vehicle::getLength() const
 {
 	return length;
 }
 
 
-double Vehicle::getWidth()
+double Vehicle::getWidth() const
 {
 	return width;
 }
 
 
-bool Vehicle::getMeasured()
+bool Vehicle::getMeasured() const
 {
 	return measured;
 }
@@ -79,8 +79,6 @@ void Vehicle::setSpeed(int speed)
 		this->speed = speed;
 		return;
 	}
-	/*this->speed += speed;
-	this->speed /= 2;*/
 }
 
 
@@ -91,10 +89,7 @@ void Vehicle::countLength()
 	
 	length = length * speed;
 
-	double x = 0.020625;
-	/*if (length > 280)
-		x = 0.0154;
-	*/
+    double x = 0.020625;
 	if (length < 400)
 	{
 		length = length + 180;

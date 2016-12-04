@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 using namespace cv;
 using namespace std;
 
@@ -18,14 +19,15 @@ BGS::BGS()
 BGS::BGS(Rect rRectArg, int history, float varThreshold, int iDetectLineX1, int iDetectLineX2, int iDetectLineY){
 	frame = 0;
 	rRect = Rect(rRectArg);
-	pMOG2 = createBackgroundSubtractorMOG2(history, varThreshold);
+    bool detectShadows = true;
+    pMOG2 = createBackgroundSubtractorMOG2(history, varThreshold, detectShadows);
 	pMOG2->setDetectShadows(true);
 	pMOG2->setNMixtures(5);
-	//pMOG2->setShadowThreshold(127);
+    //pMOG2->setShadowThreshold(127);
 	//pMOG2->setVarMin(200);
 	pMOG2->setVarThresholdGen(10.1);
-	se1 = getStructuringElement(MORPH_RECT, Point(5, 5));
-	se2 = getStructuringElement(MORPH_RECT, Point(2, 2));
+    se1 = getStructuringElement(MORPH_RECT, Point(5, 5));
+    se2 = getStructuringElement(MORPH_RECT, Point(2, 2));
 	mMaskG = getStructuringElement(MORPH_RECT, Point(5, 5));
 
 	p_pLine.first = Point(iDetectLineX1, iDetectLineY);
@@ -44,12 +46,12 @@ inline double  BGS::square(int a)
 
 void BGS::Refactor(Mat &mArg)
 {
-	morphologyEx(mArg, mArg, MORPH_CLOSE, se1);
-	morphologyEx(mArg, mArg, MORPH_OPEN, se2);
+    morphologyEx(mArg, mArg, MORPH_CLOSE, se1);
+    morphologyEx(mArg, mArg, MORPH_OPEN, se2);
 	erode(mArg, mArg, mMaskG);
 	dilate(mArg, mArg, mMaskG);
 	erode(mArg, mArg, mMaskG);
-	imshow("adsa", mArg);
+    imshow("refactor img", mArg);
 }
 
 cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Point2f>> vp_p2fArgument)
@@ -64,17 +66,15 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 	mColorFrameArg(rRect).copyTo(mColorFrame);
 	mColorFrameArg(rRect).copyTo(mColorFrame1);
 	pMOG2->apply(mColorFrame, mMask, 0.001);
-	//imshow("ad", mMask);
+    imshow("ad", mMask);
 	cv::inRange(mMask, 200, 255, mMask);
-	imshow("ad", mMask);
+    imshow("draw square img", mMask);
 	Refactor(mMask);
-	//test1(Mat(mMask), mFrame_Wrapper, rRect);
 	ret[0] = mMask;
 
 	findContours(*(new Mat(mMask)) , vvpContours, hierarchy, CV_RETR_TREE, CHAIN_APPROX_SIMPLE);
-	std::vector<std::vector<cv::Point>>::iterator itc = vvpContours.begin();
 	line(mColorFrame, p_pLine.first, p_pLine.second, Scalar(0, 255, 0), 5, CV_AA, 0);
-	while (itc != vvpContours.end()) {
+    for (auto itc = vvpContours.begin(); itc != vvpContours.end(); ++itc) {
 		std::vector<cv::Point> pts = *itc;
 		cv::Mat pointsMatrix = cv::Mat(pts);
 		cv::Scalar color(255, 255, 255);
@@ -88,11 +88,12 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 				vrVehicles.push_back(Vehicle(r0));
 			}
 			if (Vehicle::counter >= 1000)
+            {
 				Vehicle::counter = 0;
+            }
 			if (!vrPrevVehicles.empty()) {
-				std::vector<Vehicle>::iterator itcR = vrPrevVehicles.begin();
 				bool flag = false;
-				while (itcR != vrPrevVehicles.end()) {
+                for (auto itcR = vrPrevVehicles.begin(); itcR != vrPrevVehicles.end(); ++itcR) {
 					Vehicle tempr = *itcR;
 					if (tempr.getDim().contains(temp)) {
 						Point2f p2fCenter = (tempr.getDim().br() + tempr.getDim().tl()) / 2;
@@ -102,13 +103,16 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 						if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) {
 							cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);
 							tempr.measure();
-								if ((std::find(ind.begin(), ind.end(), tempr.getID()) == ind.end())) {
-									
-									ind.push_back(tempr.getID());
-									mColorFrame1(r0).copyTo(tempmat);
-									imshow("sda", tempmat);
-								}
-							
+                            if ((std::find(ind.begin(), ind.end(), tempr.getID()) == ind.end())) {
+
+                                ind.push_back(tempr.getID());
+                                mColorFrame1(r0).copyTo(tempmat);
+                                imshow("vechicles", tempmat);
+                                // wyprintować wymiary pojazdu
+                                std::cout << "Vehicle Id:" << tempr.getID() << std::endl;
+                                std::cout << "Vehicle lenght:" << tempr.getLength() << std::endl;
+                                std::cout << "Vehicle width:" << tempr.getWidth() << std::endl;
+                            }
 						}
 						else
 						{
@@ -155,7 +159,6 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 					flag = true;
 					break;
 				}
-					itcR++;
 			}
 
 			
@@ -163,16 +166,12 @@ cv::Mat* BGS::drawSquare(cv::Mat mColorFrameArg, vector<pair<cv::Point2f, cv::Po
 				if (!flag)			
 					vrVehicles.push_back(Vehicle(r0));
 			}
-
-			int *largestRect = new int[vrVehicles.size()];
-			vector<Vehicle> tmpVehicle;
-
 			
-			cv::circle(mColorFrame, temp , 5, cv::Scalar(255, 0, 255), -1, 8, 0);
+            //filotetowa kropka na obrazie optical flow
+            cv::circle(mColorFrame, temp , 5, cv::Scalar(255, 0, 255), -1, 8, 0);
 
 		}		
 	
-		++itc;
 	}
 	frame++;
 	vrPrevVehicles.swap(vrVehicles);

@@ -19,8 +19,8 @@ private:
 	cv::RNG rng;
 	cv::Rect rRect, rCntRect;
 	cv::Ptr<cv::BackgroundSubtractorMOG2> pMOG2;
-	cv::Mat  mColorFrame, mColorFrame1, mMask, mThresholdOutput, mMaskG, ret[2];
-	cv::Mat se1, se2;
+    cv::Mat mColorFrame, mColorFrame1, mMask, mThresholdOutput, mMaskG, ret[2];
+    cv::Mat se1, se2;
 	std::vector<cv::Vec4i> hierarchy;
 	std::vector<std::vector<cv::Point>> vvpContours;
 	//std::vector<cv::Rect> vrRects, vrPrevRects;

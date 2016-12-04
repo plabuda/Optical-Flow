@@ -21,14 +21,13 @@ int main(void)
 		cout << "Cannot open the video file" << endl;
 		return -1;
 	}
-
 	
 	cap >> frame;
 
 	win1 = cv::Rect(400, 200, 300, frame.rows - 200);
-	//win2 = cv::Rect(1150, 500, 150, 300);
+    //win2 = cv::Rect(1150, 500, 150, 300);
 	mMinWindow mMinFrame0 = mMinWindow(win1, winSize, subPixWinSize, termcrit);
-	//mMinWindow mMinFrame1 = mMinWindow(win2, winSize, subPixWinSize, termcrit);
+    //mMinWindow mMinFrame1 = mMinWindow(win2, winSize, subPixWinSize, termcrit);
 	BGS bgsFrame0 = BGS(win1, 30, 20, 0, win1.width, 300);
 	//BGS bgsFrame1 = BGS(win2, 30, 20, 0, 149, 120);
 	/*cv::Mat mFrame_Wrapper(
@@ -79,7 +78,7 @@ int main(void)
 		mFrame2 = result1[1];
 
 		
-		imshow("Optical Flow", mFrame2);
+        imshow("Optical Flow", mFrame2);
 		imshow("Optical Flow1", mFrame0);
 		int key_pressed = waitKey(1);
 		if (key_pressed == 'q') break;
