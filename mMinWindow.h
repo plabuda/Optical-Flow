@@ -7,7 +7,6 @@ class mMinWindow
 {
 private:
 	int iRefreshCounter = 0;
-	RNG rng;
 	Rect rRect;
 	Mat  mColorFrame, mPrevGrayFrame, mGrayFrame;
 
@@ -23,9 +22,9 @@ public:
 	mMinWindow(Rect, Size, Size, TermCriteria);
 	~mMinWindow();
 
-	int getWidth();
-	int getHeigth();
-	vector<pair<cv::Point2f, cv::Point2f>> getResultVector();
+    int getWidth() const;
+    int getHeigth() const;
+    vector<pair<cv::Point2f, cv::Point2f>> getResultVector() const;
 
 private:
 	inline double square(int);

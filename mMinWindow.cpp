@@ -13,8 +13,6 @@ mMinWindow::mMinWindow(Rect rSizeArg, Size winSizev, Size subPixWinSizev, TermCr
 	winSize = winSizev;
 	subPixWinSize = subPixWinSizev;
 	termcrit = termcritv;
-
-	rng = RNG(123);
 }
 
 
@@ -22,17 +20,17 @@ mMinWindow::~mMinWindow()
 {
 }
 
-int mMinWindow::getWidth()
+int mMinWindow::getWidth() const
 {
 	return rRect.width;
 }
 
-int mMinWindow::getHeigth()
+int mMinWindow::getHeigth() const
 {
 	return rRect.height;
 }
 
-vector<pair<cv::Point2f, cv::Point2f>> mMinWindow::getResultVector()
+vector<pair<cv::Point2f, cv::Point2f>> mMinWindow::getResultVector() const
 {
 	return resultVector;
 }
@@ -70,7 +68,7 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
 		for (int i = 0; i < corners[1].size(); i++)
 		{
 			if (status[i] == 0) continue;
-			int line_thickness; line_thickness = 2;
+            int line_thickness = 2;
 
 			CvScalar line_color; line_color = CV_RGB(255, 0, 0);
 			CvPoint p, q;
@@ -88,7 +86,9 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
 				resultVector.push_back(pair<Point2f, Point2f>(p, q));
 				q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
 				q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
-				arrowedLine(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0, 0.3);
+                std::pair<cv::Point, cv::Point> p_pLine;
+                //te czerwone vectorki na optical flow2
+                arrowedLine(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0, 0.3);
 			}
 		}
 
