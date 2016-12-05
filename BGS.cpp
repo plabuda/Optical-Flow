@@ -17,8 +17,8 @@ BGS::BGS(Rect rRectArg, int history, float varThreshold, int iDetectLineX1, int 
     pMOG2 = createBackgroundSubtractorMOG2(history, varThreshold, detectShadows);
 	pMOG2->setDetectShadows(true);
 	pMOG2->setNMixtures(5);
-    //pMOG2->setShadowThreshold(127);
-	//pMOG2->setVarMin(200);
+    pMOG2->setShadowThreshold(127);
+    pMOG2->setVarMin(200);
 	pMOG2->setVarThresholdGen(10.1);
     se1 = getStructuringElement(MORPH_RECT, Point(5, 5));
     se2 = getStructuringElement(MORPH_RECT, Point(2, 2));
@@ -37,9 +37,9 @@ void BGS::Refactor(Mat &mArg)
 {
     morphologyEx(mArg, mArg, MORPH_CLOSE, se1);
     morphologyEx(mArg, mArg, MORPH_OPEN, se2);
-	erode(mArg, mArg, mMaskG);
-	dilate(mArg, mArg, mMaskG);
-	erode(mArg, mArg, mMaskG);
+    erode(mArg, mArg, mMaskG);
+    dilate(mArg, mArg, mMaskG);
+    erode(mArg, mArg, mMaskG);
     imshow("refactor img", mArg);
 }
 
@@ -92,10 +92,6 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                                 vehicle_ids.push_back(tempr.getID());
                                 mColorFrame1(r0).copyTo(tempmat);
                                 imshow("vechicles", tempmat);
-                                // wyprintować wymiary pojazdu
-                                std::cout << "Vehicle Id:" << tempr.getID() << std::endl;
-                                std::cout << "Vehicle lenght:" << tempr.getLength() << std::endl;
-                                std::cout << "Vehicle width:" << tempr.getWidth() << std::endl;
                             }
 						}
 						else
@@ -106,6 +102,18 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 								putText(mColorFrame, std::to_string(tempr.getWidth()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255), 1, CV_AA, false);
 								putText(mColorFrame, std::to_string(tempr.getLength()), (r0.tl() + Point(r0.width / 2, 0)), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 0), 1, CV_AA, false);
 								tempr.countLength();
+                                auto measuredVehicleIt = std::find_if(measuredVehiclesVehicles.begin(),
+                                                                   measuredVehiclesVehicles.end(),
+                                                                   [&tempr](Vehicle const& veh) -> bool {return tempr.getID() == veh.getID();}
+                                                         );
+                                if (measuredVehicleIt == measuredVehiclesVehicles.end())
+                                {
+                                    measuredVehiclesVehicles.push_back(tempr);
+                                }
+                                else
+                                {
+                                    *measuredVehicleIt = tempr;
+                                }
 							}
 						}
                         for (auto itcPP = vp_p2fArgument.begin(); itcPP != vp_p2fArgument.end(); ++itcPP) {
@@ -122,7 +130,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                         vrVehicles.emplace_back(Vehicle(r0, tempr));
 						line(mColorFrame, p2fCenter, temp, color, 5, CV_AA, 0);
 
-						if (tempr.getMeasured() && !tempmat.empty())
+                        if (tempr.isMeasured() && !tempmat.empty())
 						{
 							vector<int> compression_params;
                             cv::Mat tempmat1;
@@ -131,7 +139,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 							compression_params.push_back(9);
 							putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
 							putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
-							imwrite("images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
+                            imwrite("/home/edek437/Coding/Studia/Optical-Flow/images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
 						}
 
                         flag = true;
@@ -156,5 +164,15 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 	mMask.deallocate();
 	mColorFrame.deallocate();
 	return ret;
+}
+
+void BGS::printVehicleInfo() {
+    for (auto it = measuredVehiclesVehicles.begin(); it != measuredVehiclesVehicles.end(); ++it)
+    {
+        // wyprintować wymiary pojazdów
+        std::cout << "Vehicle Id:" << it->getID() << std::endl;
+        std::cout << "Vehicle lenght:" << it->getLength() << std::endl;
+        std::cout << "Vehicle width:" << it->getWidth() << std::endl;
+    }
 }
 

@@ -15,16 +15,16 @@ public:
 	static int counter;
 	Vehicle(cv::Rect);
 	Vehicle(cv::Rect, int);
-	Vehicle(cv::Rect dimensions, Vehicle&);
+    Vehicle(cv::Rect dimensions, Vehicle const&);
 	~Vehicle();
 
     cv::Rect getDim() const;
 	void setSpeed(int speed);
     int getID() const;
 	void measure();
-    void countLength();
+    void countLength(); //and width
     double getLength() const;
     double getWidth() const;
-    bool getMeasured() const;
+    bool isMeasured() const;
 };
 

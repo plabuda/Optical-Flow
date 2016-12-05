@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Vehicle.h"
+#include <iostream>
 
 
 Vehicle::Vehicle(cv::Rect dimensions)
@@ -20,7 +21,7 @@ Vehicle::Vehicle(cv::Rect dimensions, int id)
 }
 
 
-Vehicle::Vehicle(cv::Rect dimensions, Vehicle &v1)
+Vehicle::Vehicle(cv::Rect dimensions, Vehicle const& v1)
 {
 	this->dimensions = dimensions;
 	this->id = v1.id;
@@ -66,7 +67,7 @@ double Vehicle::getWidth() const
 }
 
 
-bool Vehicle::getMeasured() const
+bool Vehicle::isMeasured() const
 {
 	return measured;
 }
@@ -74,10 +75,10 @@ bool Vehicle::getMeasured() const
 
 void Vehicle::setSpeed(int speed)
 {
+    // niedokładne strasznie
 	if (this->speed < speed)
 	{
 		this->speed = speed;
-		return;
 	}
 }
 
@@ -85,18 +86,21 @@ void Vehicle::setSpeed(int speed)
 void Vehicle::countLength()
 {
 	if (speed == 0 || measured)
+    {
 		return;
-	
+    }
+
 	length = length * speed;
 
-    double x = 0.020625;
-	if (length < 400)
-	{
-		length = length + 180;
-		length /= 2;
-	}
-	length *= x;
-	width = dimensions.width * 0.016087;
+//    double x = 0.020625;
+//	if (length < 400)
+//	{
+//		length = length + 180;
+//		length /= 2;
+//	}
+//	length *= x;
+    width = dimensions.width; // * 0.016087;
+    std::cout << "ID: " << id << ", WIDTH (DIM): " << width << " (" << dimensions.width << ")" << std::endl;
 	measured = true;
 }
 

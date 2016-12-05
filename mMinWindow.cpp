@@ -43,8 +43,11 @@ inline double  mMinWindow::square(int a)
 
 cv::Mat mMinWindow::drawVectors(Mat frame)
 {
+    cv::Mat mGrayFrame;
 	resultVector.clear();
-	if (iRefreshCounter == 15) {
+
+    //bez tego optical flow vektorki sie nie rysuja
+    if (iRefreshCounter == MAX_REFRESH_COUNTER) {
 		corners[1].clear();
 		corners[0].clear();
 		iRefreshCounter = 0;
@@ -54,23 +57,27 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
 	}
 
 	frame(rRect).copyTo(mColorFrame);
-	cvtColor(mColorFrame, mGrayFrame, cv::COLOR_BGR2GRAY);
+    cvtColor(mColorFrame, mGrayFrame, cv::COLOR_RGB2GRAY);
 	goodFeaturesToTrack(mGrayFrame, corners[1], NOF, QL, MD, Mat(), EBS, UH, EV);
 	cornerSubPix(mGrayFrame, corners[1], subPixWinSize, Size(-1, -1), termcrit);
 
 	if (mPrevGrayFrame.empty())
+    {
 		mGrayFrame.copyTo(mPrevGrayFrame);
+    }
 
 	if (!mPrevGrayFrame.empty() && !mGrayFrame.empty() && !corners[0].empty())
+    {
 		calcOpticalFlowPyrLK(mPrevGrayFrame, mGrayFrame, corners[0], corners[1], status, err, winSize, 3, termcrit, 0, 0.0000001);
+    }
 
 	if (!corners[0].empty())
 		for (int i = 0; i < corners[1].size(); i++)
 		{
-			if (status[i] == 0) continue;
-            int line_thickness = 2;
-
-			CvScalar line_color; line_color = CV_RGB(255, 0, 0);
+            if (status[i] == 0)
+            {
+                continue;
+            }
 			CvPoint p, q;
 
 			p.x = (int)corners[0][i].x;
@@ -78,22 +85,23 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
 			q.x = (int)corners[1][i].x;
 			q.y = (int)corners[1][i].y;
 
-			double angle = atan2((double)p.y - q.y, (double)p.x - q.x);
-			double hypotenuse = sqrt(square(p.y - q.y) + square(p.x - q.x));
-			circle(mColorFrame, corners[0][i], 5, Scalar(255, 0, 255), -1, 8, 0);
+            double angle = atan2((double)p.y - q.y, (double)p.x - q.x);
+            double hypotenuse = sqrt(square(p.y - q.y) + square(p.x - q.x));
+            // te filotetowe kropki na optical flow 2
+            circle(mColorFrame, corners[0][i], 5, Scalar(255, 0, 255), -1, 8, 0);
 
-			if (hypotenuse > 3 && hypotenuse < 15) {
-				resultVector.push_back(pair<Point2f, Point2f>(p, q));
+            if (hypotenuse > 3 && hypotenuse < 15) {
+                resultVector.emplace_back(pair<Point2f, Point2f>(p, q));
 				q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
 				q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
-                std::pair<cv::Point, cv::Point> p_pLine;
                 //te czerwone vectorki na optical flow2
+                CvScalar line_color = CV_RGB(255, 0, 0);
+                int line_thickness = 2;
                 arrowedLine(mColorFrame, p, q, line_color, line_thickness, CV_AA, 0, 0.3);
 			}
 		}
 
 	corners[1].swap(corners[0]);
-	swap(mPrevGrayFrame, mGrayFrame);
-	mGrayFrame.deallocate();
+    std::swap(mPrevGrayFrame, mGrayFrame);
 	return mColorFrame;
 }

@@ -31,6 +31,7 @@ int main(void)
 		cap >> frame;
 
 		if (frame.empty()) {
+            bgsFrame0.printVehicleInfo();
 			fprintf(stderr, "End of video");
 			return -1;
 		}
@@ -40,9 +41,11 @@ int main(void)
         mFrame1 = result1[0];
         mFrame2 = result1[1];
 
-		
+        //prostokąty
         imshow("Optical Flow", mFrame2);
+        //kontury
         imshow("Optical Flow1", mFrame1);
+        //vectory
         imshow("Optical Flow2", mFrame0);
 
         // sleep 1ms co klatkę

@@ -1,36 +1,35 @@
 #pragma once
-
-using namespace cv;
-using namespace std;
+#include "opencv2/opencv.hpp"
 
 class mMinWindow
 {
 private:
 	int iRefreshCounter = 0;
-	Rect rRect;
-	Mat  mColorFrame, mPrevGrayFrame, mGrayFrame;
+    constexpr static int MAX_REFRESH_COUNTER = 30;
+    cv::Rect rRect;
+    cv::Mat  mColorFrame, mPrevGrayFrame;
 
-	vector<uchar> status;
-	vector<float> err;
-	vector<cv::Point2f> corners[2];
-	vector<pair<cv::Point2f, cv::Point2f>> resultVector;
-	Size winSize, subPixWinSize;
-	TermCriteria termcrit;
+    std::vector<uchar> status;
+    std::vector<float> err;
+    std::vector<cv::Point2f> corners[2];
+    std::vector<std::pair<cv::Point2f, cv::Point2f>> resultVector;
+    cv::Size winSize, subPixWinSize;
+    cv::TermCriteria termcrit;
 
 public:
 	mMinWindow();
-	mMinWindow(Rect, Size, Size, TermCriteria);
+    mMinWindow(cv::Rect, cv::Size, cv::Size, cv::TermCriteria);
 	~mMinWindow();
 
     int getWidth() const;
     int getHeigth() const;
-    vector<pair<cv::Point2f, cv::Point2f>> getResultVector() const;
+    std::vector<std::pair<cv::Point2f, cv::Point2f>> getResultVector() const;
 
 private:
 	inline double square(int);
 
 public:
-	Mat drawVectors(cv::Mat);
+    cv::Mat drawVectors(cv::Mat);
 
 };
 

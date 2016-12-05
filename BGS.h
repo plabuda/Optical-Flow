@@ -12,6 +12,7 @@ private:
     cv::Mat se1, se2;
 	std::vector<cv::Vec4i> hierarchy;
     std::vector<Vehicle> vrPrevVehicles;
+    std::vector<Vehicle> measuredVehiclesVehicles;
 
 	
 public:
@@ -25,5 +26,6 @@ private:
 	void Refactor(cv::Mat &mArg);
 public:
     cv::Mat* drawSquare(cv::Mat const& mColorFrameArg, std::vector<std::pair<cv::Point2f, cv::Point2f>> const&);
+    void printVehicleInfo();
 };
 
