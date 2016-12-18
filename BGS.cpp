@@ -13,17 +13,17 @@ using namespace std;
 
 BGS::BGS(Rect rRectArg, int history, float varThreshold, int iDetectLineX1, int iDetectLineX2, int iDetectLineY){
 	rRect = Rect(rRectArg);
-    bool detectShadows = true;
+    bool detectShadows = false;
     pMOG2 = createBackgroundSubtractorMOG2(history, varThreshold, detectShadows);
-	pMOG2->setDetectShadows(true);
 	pMOG2->setNMixtures(5);
-    pMOG2->setShadowThreshold(127);
+//    pMOG2->setShadowThreshold(127);
     pMOG2->setVarMin(200);
 	pMOG2->setVarThresholdGen(10.1);
     se1 = getStructuringElement(MORPH_RECT, Point(5, 5));
     se2 = getStructuringElement(MORPH_RECT, Point(2, 2));
-	mMaskG = getStructuringElement(MORPH_RECT, Point(5, 5));
+    mMaskG = getStructuringElement(MORPH_RECT, Point(5, 5));
 
+    //wyznaczanie połozenia zielonej linii
 	p_pLine.first = Point(iDetectLineX1, iDetectLineY);
 	p_pLine.second = Point(iDetectLineX2, iDetectLineY);
 }
@@ -43,6 +43,7 @@ void BGS::Refactor(Mat &mArg)
     imshow("refactor img", mArg);
 }
 
+//rysowanie kwadratów wokół samochodów
 cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Point2f, cv::Point2f>> const& vp_p2fArgument)
 {
     std::vector<int> vehicle_ids;
@@ -57,29 +58,31 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 	Refactor(mMask);
 	ret[0] = mMask;
 
+    //znajduje kontury samochodów widoczne na Optical Flow1 i zapisuje je do vvpContours jako wektory punktów
     //hierarchy to arraja wyjściowa ale nigdy nie używana
+    // do przebadania: CV_RETR_XXX, CHAIN_APPROX_XXX
 	findContours(*(new Mat(mMask)) , vvpContours, hierarchy, CV_RETR_TREE, CHAIN_APPROX_SIMPLE);
     // ta zielona linia na opt flow
     line(mColorFrame, p_pLine.first, p_pLine.second, Scalar(0, 255, 0), 5, CV_AA, 0);
+    //dla wszystkich kanturów pojazdów
     for (auto itc = vvpContours.begin(); itc != vvpContours.end(); ++itc) {
-        cv::Mat pointsMatrix = cv::Mat(*itc);
-        cv::Scalar color(255, 0, 0);
+        cv::Scalar redColor(0, 0, 255);
 
-		cv::Rect r0 = cv::boundingRect(pointsMatrix);
-					
-		if (r0.area() > 4000 && r0.width < r0.height * 1.5) {
-			Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
-			if (vrPrevVehicles.empty())
-			{
-                vrVehicles.emplace_back(Vehicle(r0));
-			}
-            // wtf is that?
-			if (Vehicle::counter >= 1000)
+        //prostokat z pojazdem
+        cv::Rect r0 = cv::boundingRect(cv::Mat(*itc));
+        //patrzy czy prostokąt obejmujący pojaz jest odpowiednio wielki, i patrzy na proporcje długość szerokość
+        if (r0.area() > 3600 && r0.width < r0.height * 1.5) {
+            //środek pojazdu
+            Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
+            //pod koniec ten wektor jest zaminaiiany z wektorem pojazdów znalezionych w tej pętli stąd ta ifowa magia
+            if (vrPrevVehicles.empty())
             {
-				Vehicle::counter = 0;
+                vrVehicles.emplace_back(Vehicle(r0));
             }
-			if (!vrPrevVehicles.empty()) {
+            else
+            {
 				bool flag = false;
+                //sprawdź czy pojazd już zareejstrowano
                 for (auto itcR = vrPrevVehicles.begin(); itcR != vrPrevVehicles.end(); ++itcR) {
 					Vehicle tempr = *itcR;
 					if (tempr.getDim().contains(temp)) {
@@ -87,7 +90,9 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 
 						if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) {
 							cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);
+                            //zakładamy że w każdej klatce, w jakiej pojawił się pojazd, przesunął się o jeden piksel? Trochę to słabe
 							tempr.measure();
+                            //wygląda na to, że pomiar jednego pojazdu może odbyć się dwuktrotnie, ale brany jest tylko pierwszy wynik
                             if ((std::find(vehicle_ids.begin(), vehicle_ids.end(), tempr.getID()) == vehicle_ids.end())) {
                                 vehicle_ids.push_back(tempr.getID());
                                 mColorFrame1(r0).copyTo(tempmat);
@@ -96,7 +101,8 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 						}
 						else
 						{
-							cv::rectangle(mColorFrame, r0, color, 2);
+                            cv::rectangle(mColorFrame, r0, redColor, 2);
+                            //jeśli był już raz zmierzony (długość nie zerowa), to wyrysuj na filmie aktualne wymiaru (to jest mało widoczne)
 							if (tempr.getLength() != 0)
 							{
 								putText(mColorFrame, std::to_string(tempr.getWidth()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255), 1, CV_AA, false);
@@ -116,10 +122,13 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                                 }
 							}
 						}
+                        //vectorki otrzymane z optical flowa służa do oblicznia prędkości pojazdów w danym momencie
+                        //co jak prędkość się zmienia? Albo samochody bedą stły n. w korku?
                         for (auto itcPP = vp_p2fArgument.begin(); itcPP != vp_p2fArgument.end(); ++itcPP) {
 							pair<cv::Point2f, cv::Point2f> tempPP = *itcPP;
 							if (r0.contains(tempPP.first)) {
 								double hypotenuse = sqrt(square(tempPP.first.y - tempPP.second.y) + square(tempPP.first.x - tempPP.second.x));
+                                //znowu te magiczne widełki długość wektorka z optical flow
 								if (hypotenuse > 3 && hypotenuse < 15) {
 									tempr.setSpeed(hypotenuse);
 									break;
@@ -128,8 +137,9 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 						}
 
                         vrVehicles.emplace_back(Vehicle(r0, tempr));
-						line(mColorFrame, p2fCenter, temp, color, 5, CV_AA, 0);
-
+                        //te proste linie łączące fioletowe czasem punkty prostymi na filmie. Skąd one się biorą?
+                        line(mColorFrame, p2fCenter, temp, redColor, 5, CV_AA, 0);
+                        // zmierzone pojazdy wykadroawuj i zapisuje do pliku z szerokościa i długością pojazdu
                         if (tempr.isMeasured() && !tempmat.empty())
 						{
 							vector<int> compression_params;
@@ -137,8 +147,8 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 							tempmat.copyTo(tempmat1);
 							compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
 							compression_params.push_back(9);
-							putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
-							putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA, false);
+                            putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
+                            putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
                             imwrite("/home/edek437/Coding/Studia/Optical-Flow/images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
 						}
 
@@ -147,11 +157,12 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                     }
                 }
 
+                //pod koniec ten wektor jest zaminaiiany z wektorem pojazdów znalezionych w tej pętli stąd ta ifowa magia
                 if (!flag)
                 {
                     vrVehicles.emplace_back(Vehicle(r0));
                 }
-			}
+            }
 			
             //filotetowa kropka na obrazie optical flow
             cv::circle(mColorFrame, temp , 5, cv::Scalar(255, 0, 255), -1, 8, 0);

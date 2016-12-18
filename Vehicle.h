@@ -5,7 +5,7 @@ class Vehicle
 {
 private:
 	int id;
-	cv::Rect dimensions;
+    cv::Rect dimensions; //prostokąt obejmujący pojazd
 	double length;
 	double width;
 	int speed;

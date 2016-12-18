@@ -13,7 +13,7 @@ private:
     std::vector<float> err;
     std::vector<cv::Point2f> corners[2];
     std::vector<std::pair<cv::Point2f, cv::Point2f>> resultVector;
-    cv::Size winSize, subPixWinSize;
+    cv::Size winSize /*tu się ładuje wynik optical flowa*/, subPixWinSize; //cornerSubPix
     cv::TermCriteria termcrit;
 
 public:

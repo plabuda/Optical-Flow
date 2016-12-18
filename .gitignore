@@ -1,2 +1,4 @@
 images/*
-CmakeLists.txt.user
+CMakeLists.txt.user
+model_counting/*
+dataset/*

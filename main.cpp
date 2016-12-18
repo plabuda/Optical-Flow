@@ -8,7 +8,9 @@ using namespace cv;
 int main(void)
 {
 	Size winSize(15, 15), subPixWinSize(15, 15);
-	TermCriteria termcrit(TermCriteria::COUNT | TermCriteria::EPS, 20, 0.3);
+    //uzywane w mMinWindow
+    //im mniejszy 3ci paramert tym wolniejsze działanie, a zmiana nie widoczna
+    TermCriteria termcrit(TermCriteria::COUNT | TermCriteria::EPS, 30, 0.3);
     Mat mFrame0, mFrame1, mFrame2, frame;
 	Mat* result1;
 	VideoCapture cap;
@@ -22,15 +24,17 @@ int main(void)
 	
 	cap >> frame;
 
-	win1 = cv::Rect(400, 200, 300, frame.rows - 200);
+    win1 = cv::Rect(400, 200, 300, frame.rows - 200); //x,y,width, height
 	mMinWindow mMinFrame0 = mMinWindow(win1, winSize, subPixWinSize, termcrit);
-	BGS bgsFrame0 = BGS(win1, 30, 20, 0, win1.width, 300);
+    //Do zbadania: 2 i 3 argument (history, varThreshold)
+    BGS bgsFrame0 = BGS(win1, 300, 20, 0, win1.width, 300);
 
 	while (true)
 	{
 		cap >> frame;
 
 		if (frame.empty()) {
+            //na koncy wyświetlam informache ile pojazdów zostało zareestrowanych i jakie miały rozmiary
             bgsFrame0.printVehicleInfo();
 			fprintf(stderr, "End of video");
 			return -1;

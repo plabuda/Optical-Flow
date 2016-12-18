@@ -75,7 +75,7 @@ bool Vehicle::isMeasured() const
 
 void Vehicle::setSpeed(int speed)
 {
-    // niedokładne strasznie
+    // niedokładne strasznie i jaka była idea?
 	if (this->speed < speed)
 	{
 		this->speed = speed;
@@ -91,7 +91,7 @@ void Vehicle::countLength()
     }
 
 	length = length * speed;
-
+//  wykomentowałem, bo nie wiedziałem, skąd wzięły się te wartoci
 //    double x = 0.020625;
 //	if (length < 400)
 //	{
