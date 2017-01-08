@@ -11,6 +11,22 @@
 using namespace cv;
 using namespace std;
 
+Mat sobel(Mat gray){
+    Mat edges;
+    int scale = 1;
+    int delta = 0;
+    int ddepth = CV_16S;
+    Mat edges_x, edges_y;
+    Mat abs_edges_x, abs_edges_y;
+    Sobel(gray, edges_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT);
+    convertScaleAbs( edges_x, abs_edges_x );
+    Sobel(gray, edges_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT);
+    convertScaleAbs(edges_y, abs_edges_y);
+    addWeighted(abs_edges_x, 0.5, abs_edges_y, 0.5, 0, edges);
+    threshold(edges, edges, 240, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    return edges;
+}
+
 BGS::BGS(Rect rRectArg, int history, float varThreshold, int iDetectLineX1, int iDetectLineX2, int iDetectLineY){
 	rRect = Rect(rRectArg);
     bool detectShadows = false;
@@ -18,8 +34,8 @@ BGS::BGS(Rect rRectArg, int history, float varThreshold, int iDetectLineX1, int 
 	pMOG2->setNMixtures(5);
 //    pMOG2->setShadowThreshold(127);
     pMOG2->setVarMin(200);
-	pMOG2->setVarThresholdGen(10.1);
-    se1 = getStructuringElement(MORPH_RECT, Point(5, 5));
+    pMOG2->setVarThresholdGen(10.1);
+    se1 = getStructuringElement(MORPH_RECT, Point(10, 10));
     se2 = getStructuringElement(MORPH_RECT, Point(2, 2));
     mMaskG = getStructuringElement(MORPH_RECT, Point(5, 5));
 
@@ -52,16 +68,32 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
     std::vector<std::vector<cv::Point>> vvpContours;
 	mColorFrameArg(rRect).copyTo(mColorFrame);
 	mColorFrameArg(rRect).copyTo(mColorFrame1);
-	pMOG2->apply(mColorFrame, mMask, 0.001);
-	cv::inRange(mMask, 200, 255, mMask);
-    imshow("draw square img", mMask);
-	Refactor(mMask);
-	ret[0] = mMask;
+    // 3 argument odpowiada za częstotliwość odświeżania tła
+//    pMOG2->apply(mColorFrame, mMask, 0.001);
+    //to nic nie robi bo maska i tak jest czarno biała
+    //cv::inRange(mMask, 200, 255, mMask);
+//    imshow("draw square img", mMask);
+    //Sobel
+    cv::Mat grayFrame;
+    cvtColor(mColorFrame, grayFrame , cv::COLOR_BGR2GRAY);
+    Mat detected_edges = sobel(grayFrame);
+    //canny egde detection
+//    pMOG2->apply(mColorFrame, mMask, 0.001);
+//    Mat detected_edges;
+//    Canny(mMask, detected_edges, 1000, 1400, 3);
+//    erode(detected_edges, detected_edges, getStructuringElement(MORPH_RECT, Point(1, 1)));
+//    dilate(detected_edges, detected_edges, getStructuringElement(MORPH_RECT, Point(3, 3)));
+//    erode(detected_edges, detected_edges, getStructuringElement(MORPH_RECT, Point(1, 1)));
+//    imshow("3. Edge Detector", detected_edges);
+//    Refactor(mMask);
 
     //znajduje kontury samochodów widoczne na Optical Flow1 i zapisuje je do vvpContours jako wektory punktów
     //hierarchy to arraja wyjściowa ale nigdy nie używana
-    // do przebadania: CV_RETR_XXX, CHAIN_APPROX_XXX
-	findContours(*(new Mat(mMask)) , vvpContours, hierarchy, CV_RETR_TREE, CHAIN_APPROX_SIMPLE);
+    // do przebadania: CV_RETR_XXX, CHAIN_APPROX_XXX. Ta funkcje też zmienia wartość ret[0]
+    findContours(*(new Mat(detected_edges)) , vvpContours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE);
+    ret[0] = detected_edges;
+//    dilate(detected_edges, detected_edges, getStructuringElement(MORPH_RECT, Point(1, 1)));
+
     // ta zielona linia na opt flow
     line(mColorFrame, p_pLine.first, p_pLine.second, Scalar(0, 255, 0), 5, CV_AA, 0);
     //dla wszystkich kanturów pojazdów
@@ -71,7 +103,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
         //prostokat z pojazdem
         cv::Rect r0 = cv::boundingRect(cv::Mat(*itc));
         //patrzy czy prostokąt obejmujący pojaz jest odpowiednio wielki, i patrzy na proporcje długość szerokość
-        if (r0.area() > 3600 && r0.width < r0.height * 1.5) {
+        if (r0.area() > 4000 && r0.width < r0.height * 1.5) {
             //środek pojazdu
             Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
             //pod koniec ten wektor jest zaminaiiany z wektorem pojazdów znalezionych w tej pętli stąd ta ifowa magia
@@ -147,8 +179,8 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 							tempmat.copyTo(tempmat1);
 							compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
 							compression_params.push_back(9);
-                            putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
-                            putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
+                            putText(tempmat1, "L :" + std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
+                            putText(tempmat1, "W: " + std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
                             imwrite("/home/edek437/Coding/Studia/Optical-Flow/images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
 						}
 
@@ -178,6 +210,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 }
 
 void BGS::printVehicleInfo() {
+    std::cout << "VEHICLES FOUND:" << std::endl;
     for (auto it = measuredVehiclesVehicles.begin(); it != measuredVehiclesVehicles.end(); ++it)
     {
         // wyprintować wymiary pojazdów

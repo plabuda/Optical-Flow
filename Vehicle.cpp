@@ -80,6 +80,12 @@ void Vehicle::setSpeed(int speed)
 	{
 		this->speed = speed;
 	}
+    // lepszy pomysł:
+    // dla każdego frame liczyć średnią ilość przebytych pisekli dla
+    // wykrytych wektorów optical flow. Średnią umieszczać w strukturze
+    // która trzyma wektor kolejnych średnich przebytych odl. oraz informacje
+    // ile razy przebyta droga wynosiła 0. Kiedy pojazd przejedzie punkt kontrolny
+    // wyliczyć srednią predkość.
 }
 
 
@@ -92,14 +98,14 @@ void Vehicle::countLength()
 
 	length = length * speed;
 //  wykomentowałem, bo nie wiedziałem, skąd wzięły się te wartoci
-//    double x = 0.020625;
-//	if (length < 400)
-//	{
-//		length = length + 180;
-//		length /= 2;
-//	}
-//	length *= x;
-    width = dimensions.width; // * 0.016087;
+    double x = 0.020625;
+    if (length < 400)
+    {
+        length = length + 180;
+        length /= 2;
+    }
+    length *= x;
+    width = dimensions.width * 0.016087;
     std::cout << "ID: " << id << ", WIDTH (DIM): " << width << " (" << dimensions.width << ")" << std::endl;
 	measured = true;
 }

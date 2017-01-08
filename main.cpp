@@ -24,10 +24,12 @@ int main(void)
 	
 	cap >> frame;
 
-    win1 = cv::Rect(400, 200, 300, frame.rows - 200); //x,y,width, height
+    // ograniczenie obrazu wejściowego to jednego wyselekcjinowanego fragmentu
+    win1 = cv::Rect(430, 200, 200, frame.rows - 200); //x,y,width, height
+//    std::cout << win1.area();
 	mMinWindow mMinFrame0 = mMinWindow(win1, winSize, subPixWinSize, termcrit);
     //Do zbadania: 2 i 3 argument (history, varThreshold)
-    BGS bgsFrame0 = BGS(win1, 300, 20, 0, win1.width, 300);
+    BGS bgsFrame0 = BGS(win1, 300, 20, 0, win1.width, 250);
 
 	while (true)
 	{
@@ -40,8 +42,8 @@ int main(void)
 			return -1;
 		}
 		
-		mFrame0 = mMinFrame0.drawVectors(frame);
-		result1 = bgsFrame0.drawSquare(frame, mMinFrame0.getResultVector());
+        mFrame0 = mMinFrame0.drawVectors(frame);
+        result1 = bgsFrame0.drawSquare(frame, mMinFrame0.getResultVector());
         mFrame1 = result1[0];
         mFrame2 = result1[1];
 

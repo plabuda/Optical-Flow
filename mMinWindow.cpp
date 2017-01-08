@@ -45,6 +45,7 @@ inline double  mMinWindow::square(int a)
 cv::Mat mMinWindow::drawVectors(Mat frame)
 {
     cv::Mat mGrayFrame;
+    // to nie jest bez sensu bo istnieje funkcja getResultVector, która pobiera ostanio obliczone optical flow wektory
 	resultVector.clear();
 
     //bez tego optical flow vektorki sie nie rysuja
@@ -100,7 +101,7 @@ cv::Mat mMinWindow::drawVectors(Mat frame)
             //usunięcie tego ifa nic nie zmienia?? Jakie jest jego zadanie?
             if (hypotenuse > 3 && hypotenuse < 15) {
                 resultVector.emplace_back(pair<Point2f, Point2f>(p, q));
-                //wyznaczenie końcó czerownych wektorków
+                //wyznaczenie końców czerownych wektorków
                 double angle = atan2((double)p.y - q.y, (double)p.x - q.x);
 				q.x = (int)(p.x - 3 * hypotenuse * cos(angle));
 				q.y = (int)(p.y - 3 * hypotenuse * sin(angle));
