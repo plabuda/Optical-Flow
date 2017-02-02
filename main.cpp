@@ -16,6 +16,7 @@ int main(void)
 	Mat* result1;
 	VideoCapture cap;
     cv::Rect win1;
+
 if(piotr)  cap.open("file:///home/piotr/Pulpit/Samochody-Github/Optical-Flow/banan_ffmpeg.avi");
 else  cap.open("file:///home/edek437/Coding/Studia/Optical-Flow/banan_ffmpeg.avi");
 

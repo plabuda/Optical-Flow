@@ -80,10 +80,10 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
         {
             //środek pojazdu
             Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
-            //pod koniec ten wektor jest zaminaiiany z wektorem pojazdów znalezionych w tej pętli stąd ta ifowa magia
 
 
             cv::Point A, B, C, D, E, F;
+            Point3d dimensions;
             //konstrukcja pudełka
             //wzór prostej nieprostopadłej - y = ax + b
             //obliczamy a
@@ -95,10 +95,12 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
             //wyznaczamy początkowe, maksymalnie złe wartości
             double hg = 0.75 * abs(a) * r0.height;
             double hd = -0.75 * abs(a) * r0.height;
+            //magiczny numerek 0.75 to półtora połowy rozmiaru pudełka
+            //w sumie nie można by wystartować od zera? Do sprawdzenia
 
             //iteruj po konturach
 
-            if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x)
+            if(true)//if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x)
             {
                 for (auto itc2 = itc->begin(); itc2 != itc->end(); ++itc2)
                 {
@@ -108,7 +110,6 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                     {
                         double h_new = itc2->y - a * itc2->x;
                         h_new = h0 - h_new;
-                        //cv::line(mColorFrame, cv::Point(0, h0 + h_new), cv::Point(300, 300 * a + h0 + h_new), cv::Scalar(0,0,255), 2);
                         // poprawianie hg i hd
                         if( h_new < hg) hg = h_new;
                         if( h_new > hd) hd = h_new;
@@ -134,8 +135,10 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                 cv::line(mColorFrame, D, E,  cv::Scalar(255,0,0), 2);
                 cv::line(mColorFrame, E, F,  cv::Scalar(0,255,0), 2);
                 cv::line(mColorFrame, F, A,  cv::Scalar(0,0,255), 2);
+                dimensions.x = (cv::norm(F-A) + cv::norm(C-D))/2; //oś x - wyznaczona ze współczynnika a - długość auta
+                dimensions.y = (cv::norm(E-D) + cv::norm(A-B))/2; //oś y - nie oś x i nie oś pionowa - szerokość auta
+                dimensions.z = (cv::norm(F-E) + cv::norm(C-B))/2; //oś z - oś pionowa - wysokość auta
 
-              //  D = cv::Point(r0.x + r0.width, r0.y + r0.height);
 
                 }else
                 {
@@ -152,6 +155,11 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                 cv::line(mColorFrame, D, E,  cv::Scalar(255,0,0), 2);
                 cv::line(mColorFrame, E, F,  cv::Scalar(0,0,255), 2);
                 cv::line(mColorFrame, F, A,  cv::Scalar(0,255,0), 2);
+
+
+                dimensions.x = (cv::norm(F-E) + cv::norm(C-B))/2;
+                dimensions.y = (cv::norm(E-D) + cv::norm(A-B))/2;
+                dimensions.z = (cv::norm(F-A) + cv::norm(C-D))/2;
                 }
             }
 
@@ -159,11 +167,12 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 
 
 
+//pod koniec ten wektor jest zaminaiiany z wektorem pojazdów znalezionych w tej pętli stąd ta ifowa magia
 
 
             if (vrPrevVehicles.empty())
             {
-                vrVehicles.emplace_back(Vehicle(r0));
+                vrVehicles.emplace_back(Vehicle(r0,dimensions));
             }
             else
             {
@@ -172,38 +181,36 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                 for (auto itcR = vrPrevVehicles.begin(); itcR != vrPrevVehicles.end(); ++itcR)
                 {
                     Vehicle tempr = *itcR;
-                    if (tempr.getDim().contains(temp))
+                    if (tempr.getDim().contains(temp)) //czy środek aktualnego pojazdu należu do prostokątu innego pojazdu
                     {
                         Point2f p2fCenter = (tempr.getDim().br() + tempr.getDim().tl()) / 2;
 
-                        if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x)
+                        if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) // jeśli zahaczamy o linię to
                         {
                             //cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);
 
-                           // cv::line(mColorFrame, cv::Point(0, h0 + hg), cv::Point(300, 300 * a + h0 + hg), cv::Scalar(255, 255, 0), 2);
-                           // cv::line(mColorFrame, cv::Point(0, h0 + hd), cv::Point(300, 300 * a + h0 + hd), cv::Scalar(0, 255, 255), 2);
 
-                            //	cv::line(mColorFrame, cv::Point(-100, -100 * a + hg), cv::Point(1000, 100 * a + hg), cv::Scalar(0,255, 255), 1);
                             //zakładamy że w każdej klatce, w jakiej pojawił się pojazd, przesunął się o jeden piksel? Trochę to słabe
                             tempr.measure();
                             //wygląda na to, że pomiar jednego pojazdu może odbyć się dwuktrotnie, ale brany jest tylko pierwszy wynik
-                            if ((std::find(vehicle_ids.begin(), vehicle_ids.end(), tempr.getID()) == vehicle_ids.end()))
+                            if ((std::find(vehicle_ids.begin(), vehicle_ids.end(), tempr.getID()) == vehicle_ids.end())) // jeśli nie znaleźliśmy pojazdu o tym id
                             {
-                                vehicle_ids.push_back(tempr.getID());
+                                vehicle_ids.push_back(tempr.getID());// dodaj pojazd
                                 mColorFrame1(r0).copyTo(tempmat);
                                 imshow("vechicles", tempmat);
                             }
                         }
                         else
                         {
-                            cv::rectangle(mColorFrame, r0, redColor, 2);
+                           // cv::rectangle(mColorFrame, r0, redColor, 2);
                             // cv::line(mColorFrame, cv::Point(temp.x - 10, temp.y - a * 10), cv::Point(temp.x + 10, temp.y + a * 10), cv::Scalar(255, 255, 0), 10);
                             //jeśli był już raz zmierzony (długość nie zerowa), to wyrysuj na filmie aktualne wymiaru (to jest mało widoczne)
-                            if (tempr.getLength() != 0)
+                            if (tempr.getFrames() != 0)
                             {
+
                                 putText(mColorFrame, std::to_string(tempr.getWidth()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255), 1, CV_AA, false);
                                 putText(mColorFrame, std::to_string(tempr.getLength()), (r0.tl() + Point(r0.width / 2, 0)), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 0), 1, CV_AA, false);
-                                tempr.countLength();
+                                tempr.countLength(dimensions);
                                 //tempr.box(vvpContours, 45);
                                 auto measuredVehicleIt = std::find_if(measuredVehiclesVehicles.begin(),
                                                                       measuredVehiclesVehicles.end(),
@@ -249,7 +256,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                             compression_params.push_back(9);
                             putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
                             putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
-                            imwrite("/home/piotr/Pulpit/SAMOCHODY/Optical-Flow/images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
+                            imwrite("/home/piotr/Pulpit/Samochody-Github/Optical-Flow/images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
                         }
 
                         flag = true;
@@ -260,7 +267,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                 //pod koniec ten wektor jest zaminaiiany z wektorem pojazdów znalezionych w tej pętli stąd ta ifowa magia
                 if (!flag)
                 {
-                    vrVehicles.emplace_back(Vehicle(r0));
+                    vrVehicles.emplace_back(Vehicle(r0,dimensions));
                 }
             }
 
@@ -285,6 +292,7 @@ void BGS::printVehicleInfo()
         std::cout << "Vehicle Id:" << it->getID() << std::endl;
         std::cout << "Vehicle lenght:" << it->getLength() << std::endl;
         std::cout << "Vehicle width:" << it->getWidth() << std::endl;
+        std::cout << "Vehicle height:" << it->getHeight() << std::endl;
     }
 }
 
