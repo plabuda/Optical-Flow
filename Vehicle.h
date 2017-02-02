@@ -8,6 +8,7 @@ private:
     cv::Rect dimensions; //prostokąt obejmujący pojazd
 	double length;
 	double width;
+	double height;
 	int speed;
 	bool measured;
 
@@ -25,6 +26,7 @@ public:
     void countLength(); //and width
     double getLength() const;
     double getWidth() const;
+    double getHeight() const;
     bool isMeasured() const;
 };
 

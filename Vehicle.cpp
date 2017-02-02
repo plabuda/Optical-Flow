@@ -9,6 +9,7 @@ Vehicle::Vehicle(cv::Rect dimensions)
 	this->dimensions = dimensions;
 	counter++;
 	length = 0;
+	height = 0;
 	width = 0;
 	speed = 0;
 	measured = false;
@@ -29,6 +30,7 @@ Vehicle::Vehicle(cv::Rect dimensions, Vehicle const& v1)
 	this->speed = v1.speed;
 	this->measured = v1.measured;
 	this->width = v1.width;
+	this->height = v1.height;
 }
 
 
@@ -58,6 +60,11 @@ void Vehicle::measure()
 double Vehicle::getLength() const
 {
 	return length;
+}
+
+double Vehicle::getHeight() const
+{
+	return height;
 }
 
 
@@ -105,4 +112,5 @@ void Vehicle::countLength()
 }
 
 int Vehicle::counter = 0;
+
 
