@@ -4,7 +4,9 @@
 #include <vector> 
 using namespace std;
 using namespace cv;
-bool piotr = true; //Do zmiany ścieżki wczytywania plików
+
+#include <libgen.h>
+#include <unistd.h>
 
 int main(void)
 {
@@ -17,8 +19,16 @@ int main(void)
 	VideoCapture cap;
     cv::Rect win1;
 
-if(piotr)  cap.open("file:///home/piotr/Pulpit/Samochody-Github/Optical-Flow/banan_ffmpeg.avi");
-else  cap.open("file:///home/edek437/Coding/Studia/Optical-Flow/banan_ffmpeg.avi");
+    char buf[1024] = {0};
+    ssize_t size = readlink("/proc/self/exe", buf, sizeof(buf));
+    if (size == 0 || size == sizeof(buf))
+    {
+        return 2;
+    }
+    std::string path(dirname(buf));
+    std::cout << path << std::endl;
+
+    cap.open("file://" + path + "/banan_ffmpeg.avi");
 
 	if (!cap.isOpened()) {
 		cout << "Cannot open the video file" << endl;
