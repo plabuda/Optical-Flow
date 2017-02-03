@@ -9,7 +9,20 @@ Vehicle::Vehicle(cv::Rect dimensions)
 	this->dimensions = dimensions;
 	counter++;
 	length = 0;
+	height = 0;
 	width = 0;
+	speed = 0;
+	measured = false;
+}
+
+Vehicle::Vehicle(cv::Rect dimensions, cv::Point3d &dims)
+{
+	id = counter;
+	this->dimensions = dimensions;
+	counter++;
+	length = dims.x;
+	height = dims.z;
+	width = dims.y;
 	speed = 0;
 	measured = false;
 }
@@ -29,6 +42,7 @@ Vehicle::Vehicle(cv::Rect dimensions, Vehicle const& v1)
 	this->speed = v1.speed;
 	this->measured = v1.measured;
 	this->width = v1.width;
+	this->height = v1.height;
 }
 
 
@@ -51,7 +65,7 @@ int Vehicle::getID() const
 
 void Vehicle::measure()
 {
-	length++;
+	frames++;
 }
 
 
@@ -60,10 +74,20 @@ double Vehicle::getLength() const
 	return length;
 }
 
+double Vehicle::getHeight() const
+{
+	return height;
+}
+
 
 double Vehicle::getWidth() const
 {
 	return width;
+}
+
+double Vehicle::getFrames() const
+{
+	return frames;
 }
 
 
@@ -83,14 +107,14 @@ void Vehicle::setSpeed(int speed)
 }
 
 
-void Vehicle::countLength()
+void Vehicle::countLength(cv::Point3d &dims)
 {
 	if (speed == 0 || measured)
     {
 		return;
     }
 
-	length = length * speed;
+	length = dims.x;
 //  wykomentowałem, bo nie wiedziałem, skąd wzięły się te wartoci
 //    double x = 0.020625;
 //	if (length < 400)
@@ -99,10 +123,12 @@ void Vehicle::countLength()
 //		length /= 2;
 //	}
 //	length *= x;
-    width = dimensions.width; // * 0.016087;
+    width = dims.y; // * 0.016087;
+    height = dims.z;
     std::cout << "ID: " << id << ", WIDTH (DIM): " << width << " (" << dimensions.width << ")" << std::endl;
 	measured = true;
 }
 
 int Vehicle::counter = 0;
+
 
