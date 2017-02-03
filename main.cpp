@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "mMinWindow.h"
 #include "BGS.h"
-
+#include <vector> 
 using namespace std;
 using namespace cv;
+bool piotr = true; //Do zmiany ścieżki wczytywania plików
 
 int main(void)
 {
@@ -15,7 +16,9 @@ int main(void)
 	Mat* result1;
 	VideoCapture cap;
     cv::Rect win1;
-    cap.open("file:///home/edek437/Coding/Studia/Optical-Flow/banan_ffmpeg.avi");
+
+if(piotr)  cap.open("file:///home/piotr/Pulpit/Samochody-Github/Optical-Flow/banan_ffmpeg.avi");
+else  cap.open("file:///home/edek437/Coding/Studia/Optical-Flow/banan_ffmpeg.avi");
 
 	if (!cap.isOpened()) {
 		cout << "Cannot open the video file" << endl;
