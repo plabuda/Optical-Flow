@@ -28,8 +28,8 @@ int main(void)
     std::string path(dirname(buf));
     std::cout << path << std::endl;
 
-    cap.open("file://" + path + "/banan_ffmpeg.avi");
-
+   // cap.open("file://" + path + "/banan_ffmpeg.avi");
+cap.open("file://" + path + "/MOV_0069.avi");
 	if (!cap.isOpened()) {
 		cout << "Cannot open the video file" << endl;
 		return -1;
