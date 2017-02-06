@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "mMinWindow.h"
 #include "BGS.h"
-#include <vector> 
+#include <vector>
 using namespace std;
 using namespace cv;
 
@@ -13,7 +13,7 @@ int main(void)
 	Size winSize(15, 15), subPixWinSize(15, 15);
     //uzywane w mMinWindow
     //im mniejszy 3ci paramert tym wolniejsze działanie, a zmiana nie widoczna
-    TermCriteria termcrit(TermCriteria::COUNT | TermCriteria::EPS, 30, 0.3);
+    TermCriteria termcrit(TermCriteria::COUNT | TermCriteria::EPS, 30, 0.1);
     Mat mFrame0, mFrame1, mFrame2, frame;
 	Mat* result1;
 	VideoCapture cap;
@@ -34,7 +34,7 @@ cap.open("file://" + path + "/MOV_0069.mp4");
 		cout << "Can not open the video file" << endl;
 		return -1;
 	}
-	
+
 	cap >> frame;
 
     win1 = cv::Rect(0, 0, frame.cols, frame.rows); //x,y,width, height
@@ -52,7 +52,7 @@ cap.open("file://" + path + "/MOV_0069.mp4");
 			fprintf(stderr, "End of video");
 			return -1;
 		}
-		
+
 		mFrame0 = mMinFrame0.drawVectors(frame);
 		result1 = bgsFrame0.drawSquare(frame, mMinFrame0.getResultVector());
         mFrame1 = result1[0];
@@ -69,7 +69,7 @@ cap.open("file://" + path + "/MOV_0069.mp4");
         // bez tego nic się nie wyswietla
         int key_pressed = waitKey(1);
         if (key_pressed == 'q') break;
-			
+
 	}
 
 	return 0;

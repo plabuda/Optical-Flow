@@ -75,9 +75,9 @@ cv::Point3d BGS::construct_box(cv::Rect r0, double angle, std::vector<cv::Point_
             cv::line(mColorFrame, F, A,  cv::Scalar(0,0,255), 2);
 
         }
-        dimensions.x = (cv::norm(F-A) + cv::norm(C-D))/2; //oś x - wyznaczona ze współczynnika a - długość auta
-        dimensions.y = (cv::norm(E-D) + cv::norm(A-B))/2; //oś y - nie oś x i nie oś pionowa - szerokość auta
-        dimensions.z = (cv::norm(F-E) + cv::norm(C-B))/2; //oś z - oś pionowa - wysokość auta
+        dimensions.x = cv::norm(C-D); //oś x - wyznaczona ze współczynnika a - długość auta
+        dimensions.y = cv::norm(E-D); //oś y - nie oś x i nie oś pionowa - szerokość auta
+        dimensions.z = cv::norm(F-E); //oś z - oś pionowa - wysokość auta
 
 
     }
@@ -101,9 +101,9 @@ cv::Point3d BGS::construct_box(cv::Rect r0, double angle, std::vector<cv::Point_
         }
 
 
-        dimensions.x = (cv::norm(F-E) + cv::norm(C-B))/2;
-        dimensions.y = (cv::norm(E-D) + cv::norm(A-B))/2;
-        dimensions.z = (cv::norm(F-A) + cv::norm(C-D))/2;
+        dimensions.x = cv::norm(F-E);
+        dimensions.y = cv::norm(E-D);
+        dimensions.z = cv::norm(C-D);
     }
 
 
@@ -180,7 +180,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 
 
         //patrzy czy prostokąt obejmujący pojaz jest odpowiednio wielki, i patrzy na proporcje długość szerokość
-        if(r0.area() > 3000 && r0.width > r0.height &&  r0.width < r0.height * 2)
+        if(r0.area() > 3000 && r0.width > r0.height  &&  r0.width < r0.height * 2)
         {
 
         Point3d dimensions =  construct_box(r0,0.25,*itc,true); // konstrukcja pudełka
@@ -215,26 +215,24 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                             //zakładamy że w każdej klatce, w jakiej pojawił się pojazd, przesunął się o jeden piksel? Trochę to słabe
                             tempr.measure();
                             //wygląda na to, że pomiar jednego pojazdu może odbyć się dwuktrotnie, ale brany jest tylko pierwszy wynik
-                            if ((std::find(vehicle_ids.begin(), vehicle_ids.end(), tempr.getID()) == vehicle_ids.end())) // jeśli nie znaleźliśmy pojazdu o tym id
+                            if ((std::find(vehicle_ids.begin(), vehicle_ids.end(), tempr.getID()) == vehicle_ids.end())) // jeśli znaleźliśmy pojazd o tym id
                             {
                                 vehicle_ids.push_back(tempr.getID());// dodaj pojazd
                                 mColorFrame1(r0).copyTo(tempmat);
                                 imshow("vechicles", tempmat);
-                            }
-                        }
-                        else
-                        {
-                           // cv::rectangle(mColorFrame, r0, redColor, 2);
-                            // cv::line(mColorFrame, cv::Point(temp.x - 10, temp.y - a * 10), cv::Point(temp.x + 10, temp.y + a * 10), cv::Scalar(255, 255, 0), 10);
-                            //jeśli był już raz zmierzony (długość nie zerowa), to wyrysuj na filmie aktualne wymiaru (to jest mało widoczne)
-                            if (tempr.getFrames() != 0)
-                            {
 
-                                putText(mColorFrame, std::to_string(tempr.getWidth()), r0.tl(), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255), 1, CV_AA, false);
-                                putText(mColorFrame, std::to_string(tempr.getLength()), (r0.tl() + Point(r0.width / 2, 0)), FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 0), 1, CV_AA, false);
-                                tempr.countLength(dimensions);
-                                //tempr.box(vvpContours, 45);
-                                auto measuredVehicleIt = std::find_if(measuredVehiclesVehicles.begin(),
+                                //zapisz obraz pojazdu
+                            vector<int> compression_params;
+                            cv::Mat tempmat1;
+                            tempmat.copyTo(tempmat1);
+                            compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
+                            compression_params.push_back(9);
+                            putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
+                            putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
+                            imwrite("/home/piotr/Pulpit/Samochody-Github/Optical-Flow/images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
+
+                            // ????
+                            auto measuredVehicleIt = std::find_if(measuredVehiclesVehicles.begin(),
                                                                       measuredVehiclesVehicles.end(),
                                                                       [&tempr](Vehicle const& veh) -> bool {return tempr.getID() == veh.getID();}
                                                                      );
@@ -246,26 +244,13 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                                 {
                                     *measuredVehicleIt = tempr;
                                 }
+
+
                             }
                         }
-
-
                         vrVehicles.emplace_back(Vehicle(r0, tempr));
                         //te proste linie łączące fioletowe czasem punkty prostymi na filmie. Skąd one się biorą?
                         line(mColorFrame, p2fCenter, temp, redColor, 5, CV_AA, 0);
-                        // zmierzone pojazdy wykadroawuj i zapisuje do pliku z szerokościa i długością pojazdu
-                        if (tempr.isMeasured() && !tempmat.empty())
-                        {
-                            vector<int> compression_params;
-                            cv::Mat tempmat1;
-                            tempmat.copyTo(tempmat1);
-                            compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
-                            compression_params.push_back(9);
-                            putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
-                            putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
-                            imwrite("/home/piotr/Pulpit/Samochody-Github/Optical-Flow/images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
-                        }
-
                         flag = true;
                         break;
                     }
