@@ -31,7 +31,7 @@ int main(void)
    // cap.open("file://" + path + "/banan_ffmpeg.avi");
 cap.open("file://" + path + "/MOV_0069.mp4");
 	if (!cap.isOpened()) {
-		cout << "Cannot open the video file" << endl;
+		cout << "Can not open the video file" << endl;
 		return -1;
 	}
 	
