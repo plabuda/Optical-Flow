@@ -12,6 +12,108 @@
 using namespace cv;
 using namespace std;
 
+
+cv::Point3d BGS::construct_box(cv::Rect r0, double angle, std::vector<cv::Point_<int> > ict,  bool draw)
+{
+    Point3d result;
+    Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
+
+
+    cv::Point A, B, C, D, E, F;
+    Point3d dimensions;
+    //konstrukcja pudełka
+    //wzór prostej nieprostopadłej - y = ax + b
+    //obliczamy a
+    double a = angle;
+    //dla danego punktu x, y znajdujemy b rownaniem b = y - ax
+    // znajdujemy b srodka
+    double h0 = temp.y - a * temp.x;
+    //proste górna i dolna zadane są równaniamy y = ax + h0 + hg oraz y = ax + h0 + hd
+    //wyznaczamy początkowe, maksymalnie złe wartości
+    double hg = 0.75 * abs(a) * r0.height;
+    double hd = -0.75 * abs(a) * r0.height;
+    //magiczny numerek 0.75 to półtora połowy rozmiaru pudełka
+    //w sumie nie można by wystartować od zera? Do sprawdzenia
+
+    //iteruj po konturach
+
+    for (auto itc2 = ict.begin(); itc2 != ict.end(); ++itc2)
+    {
+
+        // jeśli punkt konturu należy do r0 policz wysokość linii przez niego przechodzącej
+        if( r0.contains(*itc2))
+        {
+            double h_new = itc2->y - a * itc2->x;
+            h_new = h0 - h_new;
+            // poprawianie hg i hd
+            if( h_new < hg) hg = h_new;
+            if( h_new > hd) hd = h_new;
+        }
+
+
+    }
+    //Obliczanie punktów
+    // przeciecie y = ax + b z osia y = n  -> x = (n - b)/a
+    //przeciecie z y = ax + b z osia x = n -> y = an + b
+    if(a < 0 )
+    {
+        A = cv::Point((r0.y - h0 - hg)/a, r0.y);
+        B = cv::Point(r0.x + r0.width, r0.y);
+        C = cv::Point(r0.x + r0.width, a * (r0.x + r0.width) + h0 + hd);
+        D = cv::Point((r0.y + r0.height - h0 - hd)/a, r0.y + r0.height);
+        E = cv::Point(r0.x, r0.y + r0.height);
+        F = cv::Point(r0.x, a * (r0.x) + h0 + hg);
+
+
+        if(draw)
+        {
+            cv::line(mColorFrame, A, B,  cv::Scalar(255,0,0), 2);
+            cv::line(mColorFrame, B, C,  cv::Scalar(0,255,0), 2);
+            cv::line(mColorFrame, C, D,  cv::Scalar(0,0,255), 2);
+            cv::line(mColorFrame, D, E,  cv::Scalar(255,0,0), 2);
+            cv::line(mColorFrame, E, F,  cv::Scalar(0,255,0), 2);
+            cv::line(mColorFrame, F, A,  cv::Scalar(0,0,255), 2);
+
+        }
+        dimensions.x = (cv::norm(F-A) + cv::norm(C-D))/2; //oś x - wyznaczona ze współczynnika a - długość auta
+        dimensions.y = (cv::norm(E-D) + cv::norm(A-B))/2; //oś y - nie oś x i nie oś pionowa - szerokość auta
+        dimensions.z = (cv::norm(F-E) + cv::norm(C-B))/2; //oś z - oś pionowa - wysokość auta
+
+
+    }
+    else
+    {
+        A = cv::Point(r0.x, r0.y);
+        B = cv::Point((r0.y - h0 - hg)/a, r0.y);
+        C = cv::Point(r0.x + r0.width, a * (r0.x + r0.width) + h0 + hg);
+        D = cv::Point(r0.x + r0.width, r0.y + r0.height);
+        E = cv::Point((r0.y + r0.height - h0 - hd)/a, r0.y + r0.height);
+        F = cv::Point(r0.x, a * (r0.x) + h0 + hd);
+
+        if(draw)
+        {
+            cv::line(mColorFrame, A, B,  cv::Scalar(255,0,0), 2);
+            cv::line(mColorFrame, B, C,  cv::Scalar(0,0,255), 2);
+            cv::line(mColorFrame, C, D,  cv::Scalar(0,255,0), 2);
+            cv::line(mColorFrame, D, E,  cv::Scalar(255,0,0), 2);
+            cv::line(mColorFrame, E, F,  cv::Scalar(0,0,255), 2);
+            cv::line(mColorFrame, F, A,  cv::Scalar(0,255,0), 2);
+        }
+
+
+        dimensions.x = (cv::norm(F-E) + cv::norm(C-B))/2;
+        dimensions.y = (cv::norm(E-D) + cv::norm(A-B))/2;
+        dimensions.z = (cv::norm(F-A) + cv::norm(C-D))/2;
+    }
+
+
+    result = dimensions;
+    return result;
+
+}
+
+
+
 BGS::BGS(Rect rRectArg, int history, float varThreshold, int iDetectLineX1, int iDetectLineX2, int iDetectLineY)
 {
     rRect = Rect(rRectArg);
@@ -60,6 +162,8 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
     Refactor(mMask);
     ret[0] = mMask;
 
+
+
     //znajduje kontury samochodów widoczne na Optical Flow1 i zapisuje je do vvpContours jako wektory punktów
     //hierarchy to arraja wyjściowa ale nigdy nie używana
     // do przebadania: CV_RETR_XXX, CHAIN_APPROX_XXX
@@ -76,93 +180,11 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 
 
         //patrzy czy prostokąt obejmujący pojaz jest odpowiednio wielki, i patrzy na proporcje długość szerokość
-        if (r0.area() > 3000 && r0.width > r0.height &&  r0.width < r0.height * 2)
+        if(r0.area() > 3000 && r0.width > r0.height &&  r0.width < r0.height * 2)
         {
-            //środek pojazdu
-            Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
 
-
-            cv::Point A, B, C, D, E, F;
-            Point3d dimensions;
-            //konstrukcja pudełka
-            //wzór prostej nieprostopadłej - y = ax + b
-            //obliczamy a
-            double a = 0.25;
-            //dla danego punktu x, y znajdujemy b rownaniem b = y - ax
-            // znajdujemy b srodka
-            double h0 = temp.y - a * temp.x;
-            //proste górna i dolna zadane są równaniamy y = ax + h0 + hg oraz y = ax + h0 + hd
-            //wyznaczamy początkowe, maksymalnie złe wartości
-            double hg = 0.75 * abs(a) * r0.height;
-            double hd = -0.75 * abs(a) * r0.height;
-            //magiczny numerek 0.75 to półtora połowy rozmiaru pudełka
-            //w sumie nie można by wystartować od zera? Do sprawdzenia
-
-            //iteruj po konturach
-
-            if(true)//if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x)
-            {
-                for (auto itc2 = itc->begin(); itc2 != itc->end(); ++itc2)
-                {
-
-                    // jeśli punkt konturu należy do r0 policz wysokość linii przez niego przechodzącej
-                    if( r0.contains(*itc2))
-                    {
-                        double h_new = itc2->y - a * itc2->x;
-                        h_new = h0 - h_new;
-                        // poprawianie hg i hd
-                        if( h_new < hg) hg = h_new;
-                        if( h_new > hd) hd = h_new;
-                    }
-
-
-                }
-                //Obliczanie punktów
-                // przeciecie y = ax + b z osia y = n  -> x = (n - b)/a
-                //przeciecie z y = ax + b z osia x = n -> y = an + b
-                if(a < 0 )
-                {
-                A = cv::Point((r0.y - h0 - hg)/a, r0.y);
-                B = cv::Point(r0.x + r0.width, r0.y);
-                C = cv::Point(r0.x + r0.width, a * (r0.x + r0.width) + h0 + hd);
-                D = cv::Point((r0.y + r0.height - h0 - hd)/a, r0.y + r0.height);
-                E = cv::Point(r0.x, r0.y + r0.height);
-                F = cv::Point(r0.x, a * (r0.x) + h0 + hg);
-
-                cv::line(mColorFrame, A, B,  cv::Scalar(255,0,0), 2);
-                cv::line(mColorFrame, B, C,  cv::Scalar(0,255,0), 2);
-                cv::line(mColorFrame, C, D,  cv::Scalar(0,0,255), 2);
-                cv::line(mColorFrame, D, E,  cv::Scalar(255,0,0), 2);
-                cv::line(mColorFrame, E, F,  cv::Scalar(0,255,0), 2);
-                cv::line(mColorFrame, F, A,  cv::Scalar(0,0,255), 2);
-                dimensions.x = (cv::norm(F-A) + cv::norm(C-D))/2; //oś x - wyznaczona ze współczynnika a - długość auta
-                dimensions.y = (cv::norm(E-D) + cv::norm(A-B))/2; //oś y - nie oś x i nie oś pionowa - szerokość auta
-                dimensions.z = (cv::norm(F-E) + cv::norm(C-B))/2; //oś z - oś pionowa - wysokość auta
-
-
-                }else
-                {
-                A = cv::Point(r0.x, r0.y);
-                B = cv::Point((r0.y - h0 - hg)/a, r0.y);
-                C = cv::Point(r0.x + r0.width, a * (r0.x + r0.width) + h0 + hg);
-                D = cv::Point(r0.x + r0.width, r0.y + r0.height);
-                E = cv::Point((r0.y + r0.height - h0 - hd)/a, r0.y + r0.height);
-                F = cv::Point(r0.x, a * (r0.x) + h0 + hd);
-
-                cv::line(mColorFrame, A, B,  cv::Scalar(255,0,0), 2);
-                cv::line(mColorFrame, B, C,  cv::Scalar(0,0,255), 2);
-                cv::line(mColorFrame, C, D,  cv::Scalar(0,255,0), 2);
-                cv::line(mColorFrame, D, E,  cv::Scalar(255,0,0), 2);
-                cv::line(mColorFrame, E, F,  cv::Scalar(0,0,255), 2);
-                cv::line(mColorFrame, F, A,  cv::Scalar(0,255,0), 2);
-
-
-                dimensions.x = (cv::norm(F-E) + cv::norm(C-B))/2;
-                dimensions.y = (cv::norm(E-D) + cv::norm(A-B))/2;
-                dimensions.z = (cv::norm(F-A) + cv::norm(C-D))/2;
-                }
-            }
-
+        Point3d dimensions =  construct_box(r0,0.25,*itc,true); // konstrukcja pudełka
+        Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
 
 
 
@@ -226,22 +248,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                                 }
                             }
                         }
-                        //vectorki otrzymane z optical flowa służa do oblicznia prędkości pojazdów w danym momencie
-                        //co jak prędkość się zmienia? Albo samochody bedą stły n. w korku?
-                        for (auto itcPP = vp_p2fArgument.begin(); itcPP != vp_p2fArgument.end(); ++itcPP)
-                        {
-                            pair<cv::Point2f, cv::Point2f> tempPP = *itcPP;
-                            if (r0.contains(tempPP.first))
-                            {
-                                double hypotenuse = sqrt(square(tempPP.first.y - tempPP.second.y) + square(tempPP.first.x - tempPP.second.x));
-                                //znowu te magiczne widełki długość wektorka z optical flow
-                                if (hypotenuse > 3 && hypotenuse < 15)
-                                {
-                                    tempr.setSpeed(hypotenuse);
-                                    break;
-                                }
-                            }
-                        }
+
 
                         vrVehicles.emplace_back(Vehicle(r0, tempr));
                         //te proste linie łączące fioletowe czasem punkty prostymi na filmie. Skąd one się biorą?
