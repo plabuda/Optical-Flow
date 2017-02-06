@@ -76,7 +76,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 
 
         //patrzy czy prostokąt obejmujący pojaz jest odpowiednio wielki, i patrzy na proporcje długość szerokość
-        if (r0.area() > 2500 && r0.width > r0.height * 1.5)
+        if (r0.area() > 3000 && r0.width > r0.height &&  r0.width < r0.height * 2)
         {
             //środek pojazdu
             Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
