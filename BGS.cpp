@@ -76,7 +76,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 
 
         //patrzy czy prostokąt obejmujący pojaz jest odpowiednio wielki, i patrzy na proporcje długość szerokość
-        if (r0.area() > 3600 && r0.width < r0.height * 1.5)
+        if (r0.area() > 2500 && r0.width > r0.height * 1.5)
         {
             //środek pojazdu
             Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
@@ -87,7 +87,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
             //konstrukcja pudełka
             //wzór prostej nieprostopadłej - y = ax + b
             //obliczamy a
-            double a = -0.5;
+            double a = 0.25;
             //dla danego punktu x, y znajdujemy b rownaniem b = y - ax
             // znajdujemy b srodka
             double h0 = temp.y - a * temp.x;

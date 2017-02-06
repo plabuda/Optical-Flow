@@ -37,10 +37,10 @@ cap.open("file://" + path + "/MOV_0069.avi");
 	
 	cap >> frame;
 
-    win1 = cv::Rect(400, 200, 300, frame.rows - 200); //x,y,width, height
+    win1 = cv::Rect(0, 0, frame.cols, frame.rows); //x,y,width, height
 	mMinWindow mMinFrame0 = mMinWindow(win1, winSize, subPixWinSize, termcrit);
     //Do zbadania: 2 i 3 argument (history, varThreshold)
-    BGS bgsFrame0 = BGS(win1, 300, 20, 0, win1.width, 300);
+    BGS bgsFrame0 = BGS(win1, 300, 20, 0, win1.width, 150);
 
 	while (true)
 	{
