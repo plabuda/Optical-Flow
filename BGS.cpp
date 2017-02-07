@@ -183,8 +183,8 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
         if(r0.area() > 3000 && r0.width > r0.height  &&  r0.width < r0.height * 2)
         {
 
-        Point3d dimensions =  construct_box(r0,0.25,*itc,true); // konstrukcja pudełka
-        Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
+            Point3d dimensions =  construct_box(r0,0.25,*itc,true); // konstrukcja pudełka
+            Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
 
 
 
@@ -208,7 +208,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                         Point2f p2fCenter = (tempr.getDim().br() + tempr.getDim().tl()) / 2;
 
                         if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) // jeśli zahaczamy o linię to
-                        //warunek do poprawienia, zdecydowanie
+                            //warunek do poprawienia, zdecydowanie
                         {
                             //cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);
 
@@ -223,22 +223,25 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                                 imshow("vechicles", tempmat);
 
                                 //zapisz obraz pojazdu
-                            vector<int> compression_params;
+                                vector<int> compression_params;
 
-                            cv::Mat tempmat1;
-                            tempmat.copyTo(tempmat1);
-                            tempr.snapshots.push_back(tempmat1);
-                            tempr.snapshots_dims.push_back(dimensions);
-                            compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
-                            compression_params.push_back(9);
-                            putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
-                            putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
-                            long volume = 1000 * dimensions.x * dimensions.y * dimensions.z;
-                            imwrite("/home/piotr/Pulpit/Samochody-Github/Optical-Flow/images/img" + std::to_string(tempr.getID()) + "_" +  std::to_string(volume) + ".png", tempmat1, compression_params);
+                                tempr.addSnapshot(tempmat,dimensions);
 
-                            // ????
+                                /*cv::Mat tempmat1;
+                                tempmat.copyTo(tempmat1);
+                                tempr.snapshots.push_back(tempmat1);
+                                tempr.snapshots_dims.push_back(dimensions);
+                                compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
+                                compression_params.push_back(9);
+                                putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
+                                putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
+                                long volume = 1000 * dimensions.x * dimensions.y * dimensions.z;
+                                imwrite("/home/piotr/Pulpit/Samochody-Github/Optical-Flow/images/img" + std::to_string(tempr.getID()) + "_" +  std::to_string(volume) + ".png", tempmat1, compression_params);
 
-                            auto measuredVehicleIt = std::find_if(measuredVehiclesVehicles.begin(),
+                                */
+                                // ????
+
+                                auto measuredVehicleIt = std::find_if(measuredVehiclesVehicles.begin(),
                                                                       measuredVehiclesVehicles.end(),
                                                                       [&tempr](Vehicle const& veh) -> bool {return tempr.getID() == veh.getID();}
                                                                      );
@@ -248,8 +251,8 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                                 }
                                 else
                                 {
-                                    measuredVehicleIt->snapshots.push_back(tempmat1);
-                                    measuredVehicleIt->snapshots_dims.push_back(dimensions);// = tempr;
+
+                                    measuredVehicleIt->addSnapshot(tempmat,dimensions);
                                 }
 
 
@@ -287,8 +290,11 @@ void BGS::printVehicleInfo()
 {
     for (auto it = measuredVehiclesVehicles.begin(); it != measuredVehiclesVehicles.end(); ++it)
     {
+
         // wyprintować wymiary pojazdów
         // posortować snapshoty po objętości, wybraź medianę?
+        it->Sort();
+        it->Save();
         std::cout << "Vehicle Id:" << it->getID() << std::endl;
         std::cout << "Vehicle lenght:" << it->getLength() << std::endl;
         std::cout << "Vehicle width:" << it->getWidth() << std::endl;

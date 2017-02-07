@@ -1,6 +1,8 @@
 #pragma once
 #include "opencv2/opencv.hpp"
 #include <vector>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 class Vehicle
 {
@@ -13,8 +15,12 @@ private:
 	int speed;
 	int frames;
 	bool measured;
+	bool sorted;
 
 public:
+	void addSnapshot(cv::Mat snapshot, cv::Point3d dimensions);
+	void Save();
+	void Sort();
 	static int counter;
 	std::vector<cv::Mat> snapshots;
 	std::vector<cv::Point3d> snapshots_dims;
