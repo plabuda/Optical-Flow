@@ -1,5 +1,6 @@
 #pragma once
 #include "opencv2/opencv.hpp"
+#include <vector>
 
 class Vehicle
 {
@@ -15,6 +16,8 @@ private:
 
 public:
 	static int counter;
+	std::vector<cv::Mat> snapshots;
+	std::vector<cv::Point3d> snapshots_dims;
 	Vehicle(cv::Rect);
 	Vehicle(cv::Rect, int);
     Vehicle(cv::Rect dimensions, Vehicle const&);

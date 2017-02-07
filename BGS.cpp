@@ -208,6 +208,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                         Point2f p2fCenter = (tempr.getDim().br() + tempr.getDim().tl()) / 2;
 
                         if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) // jeśli zahaczamy o linię to
+                        //warunek do poprawienia, zdecydowanie
                         {
                             //cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);
 
@@ -215,7 +216,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                             //zakładamy że w każdej klatce, w jakiej pojawił się pojazd, przesunął się o jeden piksel? Trochę to słabe
                             tempr.measure();
                             //wygląda na to, że pomiar jednego pojazdu może odbyć się dwuktrotnie, ale brany jest tylko pierwszy wynik
-                            if ((std::find(vehicle_ids.begin(), vehicle_ids.end(), tempr.getID()) == vehicle_ids.end())) // jeśli znaleźliśmy pojazd o tym id
+                            if ((std::find(vehicle_ids.begin(), vehicle_ids.end(), tempr.getID()) == vehicle_ids.end())) // jeśli nie znaleźliśmy pojazdu o tym id
                             {
                                 vehicle_ids.push_back(tempr.getID());// dodaj pojazd
                                 mColorFrame1(r0).copyTo(tempmat);
@@ -223,15 +224,20 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 
                                 //zapisz obraz pojazdu
                             vector<int> compression_params;
+
                             cv::Mat tempmat1;
                             tempmat.copyTo(tempmat1);
+                            tempr.snapshots.push_back(tempmat1);
+                            tempr.snapshots_dims.push_back(dimensions);
                             compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
                             compression_params.push_back(9);
                             putText(tempmat1, std::to_string(tempr.getLength()).substr(0, 5), Point(0, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
                             putText(tempmat1, std::to_string(tempr.getWidth()).substr(0, 5), Point(tempmat.cols / 2, tempmat.rows - 3), FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
-                            imwrite("/home/piotr/Pulpit/Samochody-Github/Optical-Flow/images/img" + std::to_string(tempr.getID()) + ".png", tempmat1, compression_params);
+                            long volume = 1000 * dimensions.x * dimensions.y * dimensions.z;
+                            imwrite("/home/piotr/Pulpit/Samochody-Github/Optical-Flow/images/img" + std::to_string(tempr.getID()) + "_" +  std::to_string(volume) + ".png", tempmat1, compression_params);
 
                             // ????
+
                             auto measuredVehicleIt = std::find_if(measuredVehiclesVehicles.begin(),
                                                                       measuredVehiclesVehicles.end(),
                                                                       [&tempr](Vehicle const& veh) -> bool {return tempr.getID() == veh.getID();}
@@ -242,7 +248,8 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                                 }
                                 else
                                 {
-                                    *measuredVehicleIt = tempr;
+                                    measuredVehicleIt->snapshots.push_back(tempmat1);
+                                    measuredVehicleIt->snapshots_dims.push_back(dimensions);// = tempr;
                                 }
 
 
@@ -281,10 +288,12 @@ void BGS::printVehicleInfo()
     for (auto it = measuredVehiclesVehicles.begin(); it != measuredVehiclesVehicles.end(); ++it)
     {
         // wyprintować wymiary pojazdów
+        // posortować snapshoty po objętości, wybraź medianę?
         std::cout << "Vehicle Id:" << it->getID() << std::endl;
         std::cout << "Vehicle lenght:" << it->getLength() << std::endl;
         std::cout << "Vehicle width:" << it->getWidth() << std::endl;
         std::cout << "Vehicle height:" << it->getHeight() << std::endl;
+        std::cout << "snapshots: " << it->snapshots.size() << std::endl;
     }
 }
 
