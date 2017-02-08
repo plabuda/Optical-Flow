@@ -117,8 +117,40 @@ void Vehicle::addSnapshot(cv::Mat snapshot, cv::Point3d dimensions)
     snapshots_dims.push_back(dimensions);
 }
 
+int Vehicle::Compare(cv::Point3d dim1, cv::Point3d dim2)
+{
+    double a = dim1.x * dim1.y * dim1.z;
+    double b = dim2.x * dim2.y * dim2.z;
+    if(a == b) return 0;
+    if(a > b) return -1;
+    if(b < a) return 1;
+}
+
 void Vehicle::Sort()
 {
+    for(int i = 1; i < snapshots.size(); i++)
+    {
+        for(int j = 1; j < snapshots.size() - i + 1; j++)
+        {
+            if(Compare(snapshots_dims[j-1],snapshots_dims[j]) < 0)
+            {
+                cv::Mat tempmat;
+                cv::Point3d tempdim;
+                tempmat = snapshots[j-1];
+                snapshots[j-1] = snapshots[j];
+                snapshots[j] = tempmat;
+                tempdim = snapshots_dims[j-1];
+                snapshots_dims[j-1] = snapshots_dims[j];
+                snapshots_dims[j] = tempdim;
+
+
+            }
+
+
+
+
+        }
+    }
 
 sorted = true;
 

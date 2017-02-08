@@ -21,6 +21,7 @@ public:
 	void addSnapshot(cv::Mat snapshot, cv::Point3d dimensions);
 	void Save();
 	void Sort();
+	int Compare(cv::Point3d dim1, cv::Point3d dim2);
 	static int counter;
 	std::vector<cv::Mat> snapshots;
 	std::vector<cv::Point3d> snapshots_dims;
