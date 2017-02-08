@@ -207,7 +207,9 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                     {
                         Point2f p2fCenter = (tempr.getDim().br() + tempr.getDim().tl()) / 2;
 
-                        if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) // jeśli zahaczamy o linię to
+                       // if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) // jeśli zahaczamy o linię to
+                         if(temp.x > p_pLine.first.x && temp.x < p_pLine.second.x)
+
                             //warunek do poprawienia, zdecydowanie
                         {
                             //cv::rectangle(mColorFrame, r0, cv::Scalar(255, 0, 0), 2);

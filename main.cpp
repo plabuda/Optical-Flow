@@ -29,7 +29,7 @@ int main(void)
     std::cout << path << std::endl;
 
    // cap.open("file://" + path + "/banan_ffmpeg.avi");
-cap.open("file://" + path + "/MOV_0069.mp4");
+cap.open("file://" + path + "/MOV_0069_D.mp4");
 	if (!cap.isOpened()) {
 		cout << "Can not open the video file" << endl;
 		return -1;
@@ -40,7 +40,7 @@ cap.open("file://" + path + "/MOV_0069.mp4");
     win1 = cv::Rect(0, 0, frame.cols, frame.rows); //x,y,width, height
 	mMinWindow mMinFrame0 = mMinWindow(win1, winSize, subPixWinSize, termcrit);
     //Do zbadania: 2 i 3 argument (history, varThreshold)
-    BGS bgsFrame0 = BGS(win1, 300, 20, 0, win1.width, 70);
+    BGS bgsFrame0 = BGS(win1, 300, 20, win1.width /2 - 40, win1.width/2 + 40, 70);
 
 	while (true)
 	{
