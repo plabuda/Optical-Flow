@@ -13,6 +13,56 @@ using namespace cv;
 using namespace std;
 
 
+cv::Point BGS::get_lowpoint(cv::Rect r0, double angle, std::vector<cv::Point_<int> > ict,  bool draw)
+{
+    cv::Point result;
+    Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
+    //konstrukcja pudełka
+    //wzór prostej nieprostopadłej - y = ax + b
+    //obliczamy a
+    double a = angle;
+    //dla danego punktu x, y znajdujemy b rownaniem b = y - ax
+    // znajdujemy b srodka
+    double h0 = temp.y - a * temp.x;
+    //proste górna i dolna zadane są równaniamy y = ax + h0 + hg oraz y = ax + h0 + hd
+    //wyznaczamy początkowe, maksymalnie złe wartości
+    double hd = -0.75 * abs(a) * r0.height;
+    //magiczny numerek 0.75 to półtora połowy rozmiaru pudełka
+    //w sumie nie można by wystartować od zera? Do sprawdzenia
+
+    //iteruj po konturach
+
+    for (auto itc2 = ict.begin(); itc2 != ict.end(); ++itc2)
+    {
+
+        // jeśli punkt konturu należy do r0 policz wysokość linii przez niego przechodzącej
+        if( r0.contains(*itc2))
+        {
+            double h_new = itc2->y - a * itc2->x;
+            h_new = h0 - h_new;
+            // poprawianie hg i hd
+            if( h_new > hd) hd = h_new;
+        }
+
+
+    }
+    //Obliczanie punktów
+    // przeciecie y = ax + b z osia y = n  -> x = (n - b)/a
+    //przeciecie z y = ax + b z osia x = n -> y = an + b
+    if(a < 0 )
+    {
+
+        return cv::Point((r0.y + r0.height - h0 - hd)/a, r0.y + r0.height);
+    }
+    else
+    {
+
+        return cv::Point((r0.y + r0.height - h0 - hd)/a, r0.y + r0.height);
+    }
+
+}
+
+
 cv::Point3d BGS::construct_box(cv::Rect r0, double angle, std::vector<cv::Point_<int> > ict,  bool draw)
 {
     Point3d result;
@@ -177,13 +227,15 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
 
         //prostokat z pojazdem
         cv::Rect r0 = cv::boundingRect(cv::Mat(*itc));
-
+        Point3d dimensions =  construct_box(r0,1,*itc,false);
+        cv::circle(mColorFrame, get_lowpoint(r0,1,*itc,false) , 5, cv::Scalar(0, 255, 255), -1, 8, 0);
 
         //patrzy czy prostokąt obejmujący pojaz jest odpowiednio wielki, i patrzy na proporcje długość szerokość
-        if(r0.area() > 3000 && r0.width > r0.height  &&  r0.width < r0.height * 2)
+        if(r0.area() > 2600 && dimensions.x > dimensions.y * 1.2 && get_lowpoint(r0,1,*itc,false).x > p_pLine.first.x && get_lowpoint(r0,1,*itc,false).x < p_pLine.second.x && get_lowpoint(r0,1,*itc,false).y > p_pLine.first.y)
         {
+            construct_box(r0,1,*itc,true);
 
-            Point3d dimensions =  construct_box(r0,0.25,*itc,true); // konstrukcja pudełka
+           // konstrukcja pudełka
             Point2f temp = Point2f((r0.br() + r0.tl()) / 2);
 
 
@@ -208,7 +260,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
                         Point2f p2fCenter = (tempr.getDim().br() + tempr.getDim().tl()) / 2;
 
                        // if (r0.y + r0.height >= p_pLine.first.y && r0.y < p_pLine.first.y && r0.x > p_pLine.first.x && r0.x + r0.width < p_pLine.second.x) // jeśli zahaczamy o linię to
-                         if(temp.x > p_pLine.first.x && temp.x < p_pLine.second.x)
+                      if(true)//   if(temp.x > p_pLine.first.x && temp.x < p_pLine.second.x)
 
                             //warunek do poprawienia, zdecydowanie
                         {
@@ -288,7 +340,7 @@ cv::Mat* BGS::drawSquare(cv::Mat const& mColorFrameArg, std::vector<pair<cv::Poi
     return ret;
 }
 
-void BGS::printVehicleInfo()
+void BGS::printVehicleInfo(cv::Point3d coeffs)
 {
     for (auto it = measuredVehiclesVehicles.begin(); it != measuredVehiclesVehicles.end(); ++it)
     {
@@ -298,9 +350,9 @@ void BGS::printVehicleInfo()
         it->Sort();
         it->Save();
         std::cout << "Vehicle Id:" << it->getID() << std::endl;
-        std::cout << "Vehicle lenght:" << it->getLength() << std::endl;
-        std::cout << "Vehicle width:" << it->getWidth() << std::endl;
-        std::cout << "Vehicle height:" << it->getHeight() << std::endl;
+        std::cout << "Vehicle lenght:" << it->getLength() <<"px " << it->getLength() * coeffs.x << "cm"<< std::endl;
+        std::cout << "Vehicle width:" << it->getWidth() <<"px " << it->getWidth() * coeffs.y << "cm"<< std::endl;
+        std::cout << "Vehicle height:" << it->getHeight() <<"px " << it->getHeight() * coeffs.z << "cm"<< std::endl;
         std::cout << "snapshots: " << it->snapshots.size() << std::endl;
     }
 }

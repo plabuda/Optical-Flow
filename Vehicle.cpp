@@ -172,10 +172,9 @@ void Vehicle::Save()
     std::vector<int> compression_params;
     compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
     compression_params.push_back(9);
-    putText(tempmat1, std::to_string(getLength()).substr(0, 5), cv::Point(0, tempmat1.rows - 3), cv::FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
-    putText(tempmat1, std::to_string(getWidth()).substr(0, 5), cv::Point(tempmat1.cols / 2, tempmat1.rows - 3), cv::FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
-    long volume = 1000 * dims.x * dims.y * dims.z;
-    imwrite("/home/piotr/Pulpit/Samochody-Github/Optical-Flow/images/img" + std::to_string(getID()) + "_" +  std::to_string(volume) + ".png", tempmat1, compression_params);
+    //putText(tempmat1, std::to_string(getLength()).substr(0, 5), cv::Point(0, tempmat1.rows - 3), cv::FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
+    //putText(tempmat1, std::to_string(getWidth()).substr(0, 5), cv::Point(tempmat1.cols / 2, tempmat1.rows - 3), cv::FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1, CV_AA, false);
+    imwrite("/home/piotr/Pulpit/Samochody-Github/Optical-Flow/images/img" + std::to_string(getID()) + ".png", tempmat1, compression_params);
 
 
 
