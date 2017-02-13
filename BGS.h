@@ -14,18 +14,20 @@ private:
     std::vector<Vehicle> vrPrevVehicles;
     std::vector<Vehicle> measuredVehiclesVehicles;
 
-	
+
 public:
     BGS() = default;
     BGS(cv::Rect, int history, float varThreshold, int iDetectLineX1, int iDetectLineX2, int iDetectLineY1);
     ~BGS() = default;
 
 	double square(int a);
-	
+	cv::Point3d construct_box(cv::Rect r0, double angle, std::vector<cv::Point_<int> > ict,  bool draw);
+    cv::Point get_lowpoint(cv::Rect r0, double angle, std::vector<cv::Point_<int> > ict,  bool draw);
+
 private:
 	void Refactor(cv::Mat &mArg);
 public:
     cv::Mat* drawSquare(cv::Mat const& mColorFrameArg, std::vector<std::pair<cv::Point2f, cv::Point2f>> const&);
-    void printVehicleInfo();
+    void printVehicleInfo(cv::Point3d coeffs);
 };
 
